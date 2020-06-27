@@ -254,6 +254,10 @@ public class SpringApplication {
 	 * beans from the specified primary sources (see {@link SpringApplication class-level}
 	 * documentation for details. The instance can be customized before calling
 	 * {@link #run(String...)}.
+	 *
+	 * 创建一个 SpringApplication 实例。这个应用上下文将会从指定的主要源（可以看 SpringApplication 的类级别的细节文件）来加载 bean。
+	 * 这个实例可以在调用 run() 方法之前自定义。
+	 *
 	 * @param resourceLoader the resource loader to use
 	 * @param primarySources the primary bean sources
 	 * @see #run(Class, String[])
@@ -261,13 +265,19 @@ public class SpringApplication {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public SpringApplication(ResourceLoader resourceLoader, Class<?>... primarySources) {
+		// 设置资源加载器
 		this.resourceLoader = resourceLoader;
 		Assert.notNull(primarySources, "PrimarySources must not be null");
+		// 设置主要来源
 		this.primarySources = new LinkedHashSet<>(Arrays.asList(primarySources));
+		// 设置 web 应用类型，有三种类型：REACTIVE、NONE 和 SERVLET。默认是 SERVLET
 		this.webApplicationType = WebApplicationType.deduceFromClasspath();
+		// 配置上 ApplicationContextInitializer ，通过读取 META-INF/spring.factories 文件里的指定类型的实例名（包名.类名）并实例化。
 		setInitializers((Collection) getSpringFactoriesInstances(
 				ApplicationContextInitializer.class));
+		// 与上面一样配置上应用监听器
 		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
+		// 配置主应用程序类
 		this.mainApplicationClass = deduceMainApplicationClass();
 	}
 
@@ -302,6 +312,7 @@ public class SpringApplication {
 		/**
 		 * headless模式是缺少显示设备，键盘或鼠标的系统配置。 听起来很意外，
 		 * 但实际上您可以在此模式下执行不同的操作，即使使用图形数据也是可以的。
+		 *
 		 */
 		//设置为无头模式
 		configureHeadlessProperty();
@@ -444,13 +455,13 @@ public class SpringApplication {
 	private <T> Collection<T> getSpringFactoriesInstances(Class<T> type,
 			Class<?>[] parameterTypes, Object... args) {
 		ClassLoader classLoader = getClassLoader();
-		// Use names and ensure unique to protect against duplicates
+		// 读取 META-INF/spring.factories 文件里的指定类型的实例名（包名.类名）
 		Set<String> names = new LinkedHashSet<>(
 				SpringFactoriesLoader.loadFactoryNames(type, classLoader));
-		//通过反射创建工厂实例
+		// 通过反射创建实例
 		List<T> instances = createSpringFactoriesInstances(type, parameterTypes,
 				classLoader, args, names);
-		//给工厂实例排序
+		//给实例排序
 		AnnotationAwareOrderComparator.sort(instances);
 		return instances;
 	}

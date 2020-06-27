@@ -13,7 +13,7 @@
 .gradle
 .idea
 .metadata
-.project
+.projectcmd
 .recommenders
 .settings
 .springBeans
