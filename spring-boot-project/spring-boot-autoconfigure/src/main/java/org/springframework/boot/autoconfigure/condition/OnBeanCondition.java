@@ -140,10 +140,10 @@ class OnBeanCondition extends FilteringSpringBootCondition
 		}
 		// 如果存在 @ConditionalOnSingleCandidate 注解
 		if (metadata.isAnnotated(ConditionalOnSingleCandidate.class.getName())) {
-			// 创建一个搜索条件
+			// 创建一个匹配条件
 			BeanSearchSpec spec = new SingleCandidateBeanSearchSpec(context, metadata,
 					ConditionalOnSingleCandidate.class);
-			// 返回一个搜索结果
+			// 返回一个匹配结果
 			MatchResult matchResult = getMatchingBeans(context, spec);
 			// 如果没有全部匹配上 返回一个匹配失败结果。
 			if (!matchResult.isAllMatched()) {
@@ -151,7 +151,7 @@ class OnBeanCondition extends FilteringSpringBootCondition
 						.forCondition(ConditionalOnSingleCandidate.class, spec)
 						.didNotFind("any beans").atAll());
 			}
-			// 如果匹配的结果不是 1 个则返回一个 ConditionOutcome 实例 ，原因是匹配的 bean 不唯一。
+			// 如果匹配的结果不是 1 个则返回一个匹配结果 ，原因是匹配的 bean 不唯一。
 			else if (!hasSingleAutowireCandidate(context.getBeanFactory(),
 					matchResult.getNamesOfAllMatches(),
 					spec.getStrategy() == SearchStrategy.ALL)) {
@@ -166,7 +166,7 @@ class OnBeanCondition extends FilteringSpringBootCondition
 					.items(Style.QUOTE, matchResult.getNamesOfAllMatches());
 		}
 		// 如果有 @ConditionalOnMissingBean 注解则到 context 查找指定的 bean
-		// 如果有匹配上的则返回 ConditionOutcome 对象，写上原因。
+		// 如果有匹配上的则返回匹配失败结果，写上存在着要 missing 的 bean。
 		if (metadata.isAnnotated(ConditionalOnMissingBean.class.getName())) {
 			BeanSearchSpec spec = new BeanSearchSpec(context, metadata,
 					ConditionalOnMissingBean.class);
@@ -216,6 +216,7 @@ class OnBeanCondition extends FilteringSpringBootCondition
 				matchResult.recordUnmatchedType(type);
 			}
 			else {
+				// 匹配上则把匹配上的类型放入 matchResult 上
 				matchResult.recordMatchedType(type, typeMatches);
 			}
 		}

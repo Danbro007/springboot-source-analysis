@@ -100,7 +100,7 @@ class OnWebApplicationCondition extends FilteringSpringBootCondition {
 				.isAnnotated(ConditionalOnWebApplication.class.getName());
 		// 返回 web 应用类型的结果
 		ConditionOutcome outcome = isWebApplication(context, metadata, required);
-		// 如果找到带有 @ConditionalOnWebApplication 注解的配置类但是没有匹配上，返回一个没有匹配上的 ConditionOutcome 实例。
+		// 如果找到带有 @ConditionalOnWebApplication 注解的配置类但是没有匹配上，返回一个匹配失败的结果。
 		if (required && !outcome.isMatch()) {
 			return ConditionOutcome.noMatch(outcome.getConditionMessage());
 		}
@@ -114,7 +114,7 @@ class OnWebApplicationCondition extends FilteringSpringBootCondition {
 
 	private ConditionOutcome isWebApplication(ConditionContext context,
 			AnnotatedTypeMetadata metadata, boolean required) {
-		// 根据元数据推断出 web 应用类型
+		// 根据注解元数据推断出 web 应用类型，通过获取注解元数据里的 type 来推断的。
 		switch (deduceType(metadata)) {
 		case SERVLET:
 			return isServletWebApplication(context);
@@ -161,7 +161,7 @@ class OnWebApplicationCondition extends FilteringSpringBootCondition {
 				return ConditionOutcome.match(message.foundExactly("'session' scope"));
 			}
 		}
-		// 如果当前环境是 ConfigurableWebEnvironment
+		// 如果当前环境是 ConfigurableWebEnvironment 的实现
 		if (context.getEnvironment() instanceof ConfigurableWebEnvironment) {
 			return ConditionOutcome
 					.match(message.foundExactly("ConfigurableWebEnvironment"));

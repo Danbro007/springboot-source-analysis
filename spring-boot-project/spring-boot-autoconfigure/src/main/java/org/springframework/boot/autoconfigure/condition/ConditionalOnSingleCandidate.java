@@ -28,6 +28,9 @@ import org.springframework.context.annotation.Conditional;
 /**
  * {@link Conditional} that only matches when a bean of the specified class is already
  * contained in the {@link BeanFactory} and a single candidate can be determined.
+ *
+ * 当有一个指定类的 bean 已经在 BeanFactory 里并且确定只有一个才匹配这个条件。
+ *
  * <p>
  * The condition will also match if multiple matching bean instances are already contained
  * in the {@link BeanFactory} but a primary candidate has been defined; essentially, the
