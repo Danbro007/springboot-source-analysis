@@ -50,13 +50,15 @@ class OnClassCondition extends FilteringSpringBootCondition {
 		// additional thread seems to offer the best performance. More threads make
 		// things worse
 		//  这里经过测试用两个线程去跑的话性能是最好的，大于两个线程性能反而变差。
-		// 把自动配置了分成两部分，尝试再开一个线程，现在有两个线程分别对这两部分的结果进行解析
+		// 把自动配置类分成两部分，尝试再开一个线程，现在有两个线程分别对这两部分的结果进行解析
 		int split = autoConfigurationClasses.length / 2;
 		OutcomesResolver firstHalfResolver = createOutcomesResolver(
 				autoConfigurationClasses, 0, split, autoConfigurationMetadata);
 		OutcomesResolver secondHalfResolver = new StandardOutcomesResolver(
 				autoConfigurationClasses, split, autoConfigurationClasses.length,
 				autoConfigurationMetadata, getBeanClassLoader());
+		// resolveOutcomes() 方法调用的其实是 StandardOutcomesResolver 的 getOutcomes() 方法
+		// 匹配结果 outcomes 下边对应的是 null 说明通过 OnClassCondition 的验证 既 @OnClassCondition 注解的类存在
 		ConditionOutcome[] secondHalf = secondHalfResolver.resolveOutcomes();
 		ConditionOutcome[] firstHalf = firstHalfResolver.resolveOutcomes();
 		ConditionOutcome[] outcomes = new ConditionOutcome[autoConfigurationClasses.length];
@@ -195,7 +197,8 @@ class OnClassCondition extends FilteringSpringBootCondition {
 			return getOutcomes(this.autoConfigurationClasses, this.start, this.end,
 					this.autoConfigurationMetadata);
 		}
-
+		// 以 自动配置类名.ConditionalOnClass 为 key 到 autoConfigurationClass 查找自动配置类需要的类的字符串，之后再在 classpath 查看类是否存在
+		// 如果存在则相应的 outcome 为 null
 		private ConditionOutcome[] getOutcomes(String[] autoConfigurationClasses,
 				int start, int end, AutoConfigurationMetadata autoConfigurationMetadata) {
 			ConditionOutcome[] outcomes = new ConditionOutcome[end - start];
@@ -211,7 +214,8 @@ class OnClassCondition extends FilteringSpringBootCondition {
 			}
 			return outcomes;
 		}
-
+		// 先看有没有逗号，有的话分离然后遍历用 getOutcome() ，用的策略是 ClassNameFilter.MISSING
+		// 如果存在这个类则返回 null
 		private ConditionOutcome getOutcome(String candidates) {
 			try {
 				if (!candidates.contains(",")) {

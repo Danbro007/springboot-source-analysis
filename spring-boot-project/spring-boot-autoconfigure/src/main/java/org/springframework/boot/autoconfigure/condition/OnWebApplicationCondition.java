@@ -48,6 +48,7 @@ class OnWebApplicationCondition extends FilteringSpringBootCondition {
 
 	private static final String REACTIVE_WEB_APPLICATION_CLASS = "org.springframework.web.reactive.HandlerResult";
 
+	// 以 自动配置类名.ConditionalOnWebApplication 为 key 到 autoConfigurationMetadata 查看 然后调用 getOutcome() 获取结果
 	@Override
 	protected ConditionOutcome[] getOutcomes(String[] autoConfigurationClasses,
 			AutoConfigurationMetadata autoConfigurationMetadata) {
@@ -62,6 +63,8 @@ class OnWebApplicationCondition extends FilteringSpringBootCondition {
 		return outcomes;
 	}
 
+	// 通过 @ConditionalOnWebApplication 设置的 type 是不是 SERVLET、REACTIVE 或者两者都有
+	// 如果都不符合则返回 null
 	private ConditionOutcome getOutcome(String type) {
 		if (type == null) {
 			return null;
