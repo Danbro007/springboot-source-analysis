@@ -71,6 +71,9 @@ public final class ConditionEvaluationReport {
 
 	/**
 	 * Record the occurrence of condition evaluation.
+	 *
+	 * 记录条件评估的事件。
+	 *
 	 * @param source the source of the condition (class or method name)
 	 * @param condition the condition evaluated
 	 * @param outcome the condition outcome
@@ -176,6 +179,9 @@ public final class ConditionEvaluationReport {
 
 	/**
 	 * Obtain a {@link ConditionEvaluationReport} for the specified bean factory.
+	 *
+	 * 获取指定 bean 工厂的条件评估报告 。
+	 *
 	 * @param beanFactory the bean factory
 	 * @return an existing or new {@link ConditionEvaluationReport}
 	 */

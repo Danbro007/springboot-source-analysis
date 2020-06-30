@@ -29,9 +29,15 @@ import org.springframework.context.annotation.Conditional;
 /**
  * {@link Conditional} that only matches when no beans of the specified classes and/or
  * with the specified names are already contained in the {@link BeanFactory}.
+ *
+ * 只有在 BeanFactory 中没有包含指定名称的指定类 和/或 的bean时才匹配的条件。
+ *
  * <p>
  * When placed on a {@code @Bean} method, the bean class defaults to the return type of
  * the factory method:
+ *
+ *
+ * 当放在  @Bean 方法时，这个 bean 类默认返回工厂方法类型：
  *
  * <pre class="code">
  * &#064;Configuration

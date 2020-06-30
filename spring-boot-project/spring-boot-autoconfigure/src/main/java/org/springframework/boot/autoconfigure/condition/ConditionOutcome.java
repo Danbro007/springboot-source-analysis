@@ -91,6 +91,9 @@ public class ConditionOutcome {
 
 	/**
 	 * Create a new {@link ConditionOutcome} instance for 'no match'.
+	 *
+	 *  为 no match 创建一个新的 ConditionOutcome 实例
+	 *
 	 * @param message the message
 	 * @return the {@link ConditionOutcome}
 	 */

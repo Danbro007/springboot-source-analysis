@@ -64,6 +64,9 @@ public @interface ConditionalOnBean {
 	/**
 	 * The class types of beans that should be checked. The condition matches when beans
 	 * of all classes specified are contained in the {@link BeanFactory}.
+	 *
+	 * 检查的 bean 类型。当指定的所有类的 bean 包含在 BeanFactory 中时，条件匹配
+	 *
 	 * @return the class types of beans to check
 	 */
 	Class<?>[] value() default {};
@@ -71,6 +74,9 @@ public @interface ConditionalOnBean {
 	/**
 	 * The class type names of beans that should be checked. The condition matches when
 	 * beans of all classes specified are contained in the {@link BeanFactory}.
+	 *
+	 * 检查 bean 的类型名。
+	 *
 	 * @return the class type names of beans to check
 	 */
 	String[] type() default {};
@@ -79,6 +85,9 @@ public @interface ConditionalOnBean {
 	 * The annotation type decorating a bean that should be checked. The condition matches
 	 * when all of the annotations specified are defined on beans in the
 	 * {@link BeanFactory}.
+	 *
+	 *检查装饰一个 bean 的注解类型。
+	 *
 	 * @return the class-level annotation types to check
 	 */
 	Class<? extends Annotation>[] annotation() default {};
@@ -86,6 +95,9 @@ public @interface ConditionalOnBean {
 	/**
 	 * The names of beans to check. The condition matches when all of the bean names
 	 * specified are contained in the {@link BeanFactory}.
+	 *
+	 * 检查 bean 的名
+	 *
 	 * @return the names of beans to check
 	 */
 	String[] name() default {};
@@ -93,6 +105,9 @@ public @interface ConditionalOnBean {
 	/**
 	 * Strategy to decide if the application context hierarchy (parent contexts) should be
 	 * considered.
+	 *
+	 * 决定是否应该考虑 应用程序 context 结构是有层次的（有父 context）的策略。默认是包括当前 context 和祖先 context。
+	 *
 	 * @return the search strategy
 	 */
 	SearchStrategy search() default SearchStrategy.ALL;

@@ -25,6 +25,9 @@ import org.springframework.context.ConfigurableApplicationContext;
  * itself, but beware of modifying its internal state since all initialization steps will
  * have been completed by then.
  *
+ * 事件尽可能晚的发布，表明应用程序已经准备好为请求服务。事件的源是 Spring 应用它自己，
+ * 但是要注意不要修改它的内部状态，因为那时所有的初始化步骤都已经完成了。
+ *
  * @author Stephane Nicoll
  * @since 1.3.0
  * @see ApplicationFailedEvent

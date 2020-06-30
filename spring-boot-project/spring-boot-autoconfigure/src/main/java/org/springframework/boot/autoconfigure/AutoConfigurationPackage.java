@@ -29,6 +29,8 @@ import org.springframework.context.annotation.Import;
  * Indicates that the package containing the annotated class should be registered with
  * {@link AutoConfigurationPackages}.
  *
+ * 表示这个包所包含 AutoConfigurationPackage 注解的类应该用 AutoConfigurationPackages 注册
+ *
  * @author Phillip Webb
  * @since 1.3.0
  * @see AutoConfigurationPackages

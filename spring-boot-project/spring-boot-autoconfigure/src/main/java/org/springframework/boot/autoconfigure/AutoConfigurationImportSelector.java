@@ -58,9 +58,12 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * {@link DeferredImportSelector} to handle {@link EnableAutoConfiguration
+ * {@link DeferredImportSelector} to handle {@link EnaoadbleAutoConfiguration
  * auto-configuration}. This class can also be subclassed if a custom variant of
  * {@link EnableAutoConfiguration @EnableAutoConfiguration} is needed.
+ *
+ * DeferredImportSelector 用来处理 @EnableAutoConfiguration 的自动配置。
+ * 如果需要  @EnableAutoConfiguration 的自定义变体，这个类也可以被子类化。
  *
  * @author Phillip Webb
  * @author Andy Wilkinson
@@ -105,6 +108,11 @@ public class AutoConfigurationImportSelector
 	/**
 	 * Return the {@link AutoConfigurationEntry} based on the {@link AnnotationMetadata}
 	 * of the importing {@link Configuration @Configuration} class.
+	 *
+	 * 根据导入的 @Configuration 类的注解元数据返回 AutoConfigurationEntry。
+	 *
+	 * AutoConfigurationEntry 是对 configurations 和 exclusions 的封装。
+	 *
 	 * @param autoConfigurationMetadata the auto-configuration metadata
 	 * @param annotationMetadata the annotation metadata of the configuration class
 	 * @return the auto-configurations that should be imported
@@ -168,9 +176,12 @@ public class AutoConfigurationImportSelector
 	}
 
 	/**
-	 * Return the auto-configuration class names that should be considered. By default
-	 * this method will load candidates using {@link SpringFactoriesLoader} with
-	 * {@link #getSpringFactoriesLoaderFactoryClass()}.
+	 * Return the auto-configuration class names that shouldBy default
+	 * 	 * this method will load candidates using {@link SpringFactoriesLoader} with
+	 * 	 * {@link #getSpringFactoriesLoaderFactoryClass()}. be considered.
+	 *
+	 * 返回应该考虑的自动配置类名。默认情况下此方法将使用 SpringFactoriesLoader 和 getSpringFactoriesLoaderFactoryClass() 加载候选对象。
+	 *
 	 * @param metadata the source metadata
 	 * @param attributes the {@link #getAttributes(AnnotationMetadata) annotation
 	 * attributes}

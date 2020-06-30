@@ -24,9 +24,15 @@ import org.springframework.core.annotation.Order;
  * a {@link SpringApplication}. Multiple {@link CommandLineRunner} beans can be defined
  * within the same application context and can be ordered using the {@link Ordered}
  * interface or {@link Order @Order} annotation.
+ *
+ * 这个接口被用于表明当一个 bean 被包含在一个 Spring 应用时应该运行。多个 CommandLineRunner bean可以被定义在相同的 applicationContext 里
+ * 并且使用 Ordered 接口或者 @Order 注解来排序。
+ *
  * <p>
  * If you need access to {@link ApplicationArguments} instead of the raw String array
  * consider using {@link ApplicationRunner}.
+ *
+ * 如果你需要访问 ApplicationArguments 而不是原始字符串数组，考虑使用 ApplicationRunner。
  *
  * @author Dave Syer
  * @see ApplicationRunner

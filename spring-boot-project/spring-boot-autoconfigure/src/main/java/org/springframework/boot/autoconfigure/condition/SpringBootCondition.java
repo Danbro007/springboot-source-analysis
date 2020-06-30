@@ -32,6 +32,9 @@ import org.springframework.util.StringUtils;
  * Base of all {@link Condition} implementations used with Spring Boot. Provides sensible
  * logging to help the user diagnose what classes are loaded.
  *
+ * SpringBootCondition 是使用 Spring Boot 中使用所有的 Condition 实现的基础。
+ * 提供日志记录来帮助用户诊断加载了什么类。
+ *
  * @author Phillip Webb
  * @author Greg Turnquist
  */
@@ -42,11 +45,16 @@ public abstract class SpringBootCondition implements Condition {
 	@Override
 	public final boolean matches(ConditionContext context,
 			AnnotatedTypeMetadata metadata) {
+		// 通过注解元数据获取类名或者方法名
 		String classOrMethodName = getClassOrMethodName(metadata);
 		try {
+			// 获取匹配结果，getMatchOutcome 是一个模板方法让子类自己实现。
 			ConditionOutcome outcome = getMatchOutcome(context, metadata);
+			// 打印匹配结果的日志
 			logOutcome(classOrMethodName, outcome);
+			// 把结果记录在 ConditionEvaluationReport 里
 			recordEvaluation(context, classOrMethodName, outcome);
+			// 返回匹配结果
 			return outcome.isMatch();
 		}
 		catch (NoClassDefFoundError ex) {
@@ -118,6 +126,9 @@ public abstract class SpringBootCondition implements Condition {
 
 	/**
 	 * Determine the outcome of the match along with suitable log output.
+	 *
+	 * 确定匹配的结果以及合适的日志输出。
+	 *
 	 * @param context the condition context
 	 * @param metadata the annotation metadata
 	 * @return the condition outcome
@@ -139,16 +150,22 @@ public abstract class SpringBootCondition implements Condition {
 				return true;
 			}
 		}
+
 		return false;
 	}
 
 	/**
 	 * Return true if any of the specified condition matches.
+	 *
+	 * 如果有匹配上这个条件的返回 true
+	 *
 	 * @param context the context
 	 * @param metadata the annotation meta-data
 	 * @param condition condition to test
 	 * @return {@code true} if the condition matches.
 	 */
+	// 如果是 SpringBootCondition 对象 则调用它的 getMatchOutcome 来返回匹配结果
+	// 其余的则调用 Condition 接口的 matches() 方法
 	protected final boolean matches(ConditionContext context,
 			AnnotatedTypeMetadata metadata, Condition condition) {
 		if (condition instanceof SpringBootCondition) {

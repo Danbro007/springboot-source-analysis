@@ -23,10 +23,16 @@ import org.springframework.core.io.support.SpringFactoriesLoader;
 
 /**
  * Listener for the {@link SpringApplication} {@code run} method.
+ *
+ * 来监听 Spring 应用的 run() 方法的。
+ *
  * {@link SpringApplicationRunListener}s are loaded via the {@link SpringFactoriesLoader}
  * and should declare a public constructor that accepts a {@link SpringApplication}
  * instance and a {@code String[]} of arguments. A new
  * {@link SpringApplicationRunListener} instance will be created for each run.
+ *
+ * SpringApplicationRunListener 通过 SpringFactoriesLoader 加载并且应该声明一个公开的能接收参数一个是 Spring 应用实例和一个 String[] 的构造器。
+ * 每次运行是都能创建一个新的 SpringApplicationRunListener 实例。
  *
  * @author Phillip Webb
  * @author Dave Syer
@@ -37,6 +43,9 @@ public interface SpringApplicationRunListener {
 	/**
 	 * Called immediately when the run method has first started. Can be used for very
 	 * early initialization.
+	 *
+	 * 当 run() 第一次启动时立即调用。可以用于非常早期的初始化。
+	 *
 	 */
 	void starting();
 
@@ -74,6 +83,10 @@ public interface SpringApplicationRunListener {
 	 * Called immediately before the run method finishes, when the application context has
 	 * been refreshed and all {@link CommandLineRunner CommandLineRunners} and
 	 * {@link ApplicationRunner ApplicationRunners} have been called.
+	 *
+	 * 在 run() 方法完成前立即调用，当 applicationContext 已经被刷新并且所有的 CommandLineRunner
+	 * 和 ApplicationRunner 已经被调用。
+	 *
 	 * @param context the application context.
 	 * @since 2.0.0
 	 */

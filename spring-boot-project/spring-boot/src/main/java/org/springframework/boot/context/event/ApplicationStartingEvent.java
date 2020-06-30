@@ -28,6 +28,10 @@ import org.springframework.core.env.Environment;
  * of the event is the {@link SpringApplication} itself, but beware of using its internal
  * state too much at this early stage since it might be modified later in the lifecycle.
  *
+ * 当 Spring 应用启动时，尽可能早地发布事件 ---- 在环境或 ApplicationContext 可用之前，
+ * 但在应用监听器已注册之后。这个事件的源是 Spring 应用它自己，但是要注意在这个早期阶段过多地使用它的内部状态，
+ * 因为它可能在生命周期的后期被修改。
+ *
  * @author Phillip Webb
  * @author Madhura Bhave
  * @since 1.5.0

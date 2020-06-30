@@ -316,33 +316,35 @@ public class SpringApplication {
 		 */
 		//设置为无头模式
 		configureHeadlessProperty();
-		//获取监听器并运行
+		// 从 \META-INF\spring.factories 文件获取默认的 SpringApplicationRunListener 实例化并运行
+		// SpringApplicationRunListeners 是来监听 applicationContext 的 run() 方法的。
 		SpringApplicationRunListeners listeners = getRunListeners(args);
+		// 让所有监听器监听 ApplicationStartingEvent 这个事件
 		listeners.starting();
 		try {
-			//提供运行spring应用参数的访问
+			//提供对用于运行 Spring 应用的参数的访问
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(
 					args);
-			//创建并配置环境
+			//创建并配置环境，把环境绑定到 Spring 应用上。
 			ConfigurableEnvironment environment = prepareEnvironment(listeners,
 					applicationArguments);
-			//设置要忽略的bean信息
+			//设置要忽略的 bean 信息
 			configureIgnoreBeanInfo(environment);
 			//打印Banner
 			Banner printedBanner = printBanner(environment);
-			//根据webApplicationType的类型创建applicationContext,我们平时应用的类型是SERVLET
+			//根据 web 应用的类型创建 applicationContext,我们平时应用的类型是 SERVLET
 			context = createApplicationContext();
-			//获取工厂实例
+			//从 \META-INF\spring.factories 文件获取默认的 SpringBootExceptionReporter 并实例化
 			exceptionReporters = getSpringFactoriesInstances(
 					SpringBootExceptionReporter.class,
 					new Class[] { ConfigurableApplicationContext.class }, context);
-			//给applicationContext配置环境
+			// 把环境、监听器、应用参数和 Banner 注册进 applicationContext
 			prepareContext(context, environment, listeners, applicationArguments,
 					printedBanner);
 			//刷新applicationContext
 			//其实就是 springCore 里的 refresh()的源码
 			refreshContext(context);
-			//子类实现刷新applicationContext之后的操作
+			//子类实现刷新 applicationContext 之后的操作，子类可以自己实现。
 			afterRefresh(context, applicationArguments);
 			//关机计时器
 			stopWatch.stop();
@@ -350,8 +352,9 @@ public class SpringApplication {
 				new StartupInfoLogger(this.mainApplicationClass)
 						.logStarted(getApplicationLog(), stopWatch);
 			}
-			//监听器监听applicationContext
+			//让所有监听器监听 ApplicationStartedEvent 这个事件
 			listeners.started(context);
+			// 调用所有的 runner
 			callRunners(context, applicationArguments);
 		}
 		catch (Throwable ex) {
@@ -360,6 +363,7 @@ public class SpringApplication {
 		}
 
 		try {
+			// 让所有监听器监听 ApplicationStartingEvent 事件
 			listeners.running(context);
 		}
 		catch (Throwable ex) {
@@ -372,15 +376,18 @@ public class SpringApplication {
 	private ConfigurableEnvironment prepareEnvironment(
 			SpringApplicationRunListeners listeners,
 			ApplicationArguments applicationArguments) {
-		// Create and configure the environment
+		// 创建并配置环境
 		ConfigurableEnvironment environment = getOrCreateEnvironment();
 		configureEnvironment(environment, applicationArguments.getSourceArgs());
+		// 让所有监听器注册 ApplicationContextInitializedEvent 事件
 		listeners.environmentPrepared(environment);
+		// 给 Spring 应用绑定环境
 		bindToSpringApplication(environment);
 		if (!this.isCustomEnvironment) {
 			environment = new EnvironmentConverter(getClassLoader())
 					.convertEnvironmentIfNecessary(environment, deduceEnvironmentClass());
 		}
+
 		ConfigurationPropertySources.attach(environment);
 		return environment;
 	}
@@ -399,8 +406,11 @@ public class SpringApplication {
 	private void prepareContext(ConfigurableApplicationContext context,
 			ConfigurableEnvironment environment, SpringApplicationRunListeners listeners,
 			ApplicationArguments applicationArguments, Banner printedBanner) {
+		// 给 context 配置环境
 		context.setEnvironment(environment);
+		// 对 context 应用后置处理
 		postProcessApplicationContext(context);
+		// 调用所有初始化器对 context 初始化
 		applyInitializers(context);
 		listeners.contextPrepared(context);
 		if (this.logStartupInfo) {
@@ -409,7 +419,9 @@ public class SpringApplication {
 		}
 		// Add boot specific singleton beans
 		ConfigurableListableBeanFactory beanFactory = context.getBeanFactory();
+		// 注册应用参数
 		beanFactory.registerSingleton("springApplicationArguments", applicationArguments);
+		// 注册 Banner
 		if (printedBanner != null) {
 			beanFactory.registerSingleton("springBootBanner", printedBanner);
 		}
@@ -417,7 +429,7 @@ public class SpringApplication {
 			((DefaultListableBeanFactory) beanFactory)
 					.setAllowBeanDefinitionOverriding(this.allowBeanDefinitionOverriding);
 		}
-		// Load the sources
+		// 读取资源
 		Set<Object> sources = getAllSources();
 		Assert.notEmpty(sources, "Sources must not be empty");
 		load(context, sources.toArray(new Object[0]));
@@ -644,14 +656,19 @@ public class SpringApplication {
 	/**
 	 * Apply any relevant post processing the {@link ApplicationContext}. Subclasses can
 	 * apply additional processing as required.
+	 *
+	 * 对 ApplicationContext 使用任何的后置处理。如果需要的话子类能应用额外的处理。
+	 *
 	 * @param context the application context
 	 */
 	protected void postProcessApplicationContext(ConfigurableApplicationContext context) {
+		// 配置 BeanName 生成器。可以通过它把 BeanDefinition 生成 BeanName
 		if (this.beanNameGenerator != null) {
 			context.getBeanFactory().registerSingleton(
 					AnnotationConfigUtils.CONFIGURATION_BEAN_NAME_GENERATOR,
 					this.beanNameGenerator);
 		}
+		// 配置资源加载器
 		if (this.resourceLoader != null) {
 			if (context instanceof GenericApplicationContext) {
 				((GenericApplicationContext) context)
@@ -662,6 +679,7 @@ public class SpringApplication {
 						.setClassLoader(this.resourceLoader.getClassLoader());
 			}
 		}
+		// 设置转换服务
 		if (this.addConversionService) {
 			context.getBeanFactory().setConversionService(
 					ApplicationConversionService.getSharedInstance());
@@ -822,6 +840,7 @@ public class SpringApplication {
 		List<Object> runners = new ArrayList<>();
 		runners.addAll(context.getBeansOfType(ApplicationRunner.class).values());
 		runners.addAll(context.getBeansOfType(CommandLineRunner.class).values());
+		// 给所有的 runner 排序
 		AnnotationAwareOrderComparator.sort(runners);
 		for (Object runner : new LinkedHashSet<>(runners)) {
 			if (runner instanceof ApplicationRunner) {

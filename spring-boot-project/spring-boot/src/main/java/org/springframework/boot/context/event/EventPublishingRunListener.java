@@ -69,7 +69,7 @@ public class EventPublishingRunListener implements SpringApplicationRunListener,
 		this.initialMulticaster.multicastEvent(
 				new ApplicationStartingEvent(this.application, this.args));
 	}
-
+	// 设置监听的事件
 	@Override
 	public void environmentPrepared(ConfigurableEnvironment environment) {
 		this.initialMulticaster.multicastEvent(new ApplicationEnvironmentPreparedEvent(
@@ -100,6 +100,7 @@ public class EventPublishingRunListener implements SpringApplicationRunListener,
 				new ApplicationStartedEvent(this.application, this.args, context));
 	}
 
+	// 通知所有的监听器注册这个事件
 	@Override
 	public void running(ConfigurableApplicationContext context) {
 		context.publishEvent(

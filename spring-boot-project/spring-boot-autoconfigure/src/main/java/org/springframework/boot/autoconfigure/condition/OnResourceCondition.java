@@ -41,18 +41,28 @@ class OnResourceCondition extends SpringBootCondition {
 
 	private final ResourceLoader defaultResourceLoader = new DefaultResourceLoader();
 
+	/**
+	 *
+	 * @param context the condition context
+	 * @param metadata the annotation metadata
+	 * @return
+	 */
 	@Override
 	public ConditionOutcome getMatchOutcome(ConditionContext context,
 			AnnotatedTypeMetadata metadata) {
+		// 获取资源路径
 		MultiValueMap<String, Object> attributes = metadata
 				.getAllAnnotationAttributes(ConditionalOnResource.class.getName(), true);
+		// 获取资源加载器
 		ResourceLoader loader = (context.getResourceLoader() != null)
 				? context.getResourceLoader() : this.defaultResourceLoader;
 		List<String> locations = new ArrayList<>();
+		// 把资源路径放入 locations 里
 		collectValues(locations, attributes.get("resources"));
 		Assert.isTrue(!locations.isEmpty(),
 				"@ConditionalOnResource annotations must specify at "
 						+ "least one resource location");
+		// 尝试加载 locations 里的所有资源如果资源不存在则加入 missing 里。
 		List<String> missing = new ArrayList<>();
 		for (String location : locations) {
 			String resource = context.getEnvironment().resolvePlaceholders(location);
@@ -60,11 +70,13 @@ class OnResourceCondition extends SpringBootCondition {
 				missing.add(location);
 			}
 		}
+		// 如果 missing 为不空则创建一个 ConditionOutcome 实例，里面包括没匹配上的资源信息。
 		if (!missing.isEmpty()) {
 			return ConditionOutcome.noMatch(ConditionMessage
 					.forCondition(ConditionalOnResource.class)
 					.didNotFind("resource", "resources").items(Style.QUOTE, missing));
 		}
+		// 创建一个 ConditionOutcome 实例包括匹配的资源信息
 		return ConditionOutcome
 				.match(ConditionMessage.forCondition(ConditionalOnResource.class)
 						.found("location", "locations").items(locations));

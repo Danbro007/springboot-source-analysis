@@ -31,6 +31,8 @@ import org.springframework.web.context.support.StandardServletEnvironment;
 /**
  * Utility class for converting one type of {@link Environment} to another.
  *
+ * 用于将一种类型的环境转换为另一种类型的实用程序类。
+ *
  * @author Ethan Rubinson
  * @author Andy Wilkinson
  * @author Madhura Bhave

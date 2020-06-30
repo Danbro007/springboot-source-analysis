@@ -185,6 +185,9 @@ public final class ConditionMessage {
 	/**
 	 * Factory method for a builder to construct a new {@link ConditionMessage} for a
 	 * condition.
+	 *
+	 * 构造器的工厂方法，用于为条件构造一个新的 ConditionMessage 。
+	 *
 	 * @param condition the condition
 	 * @param details details of the condition
 	 * @return a {@link Builder} builder
