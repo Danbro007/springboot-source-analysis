@@ -46,11 +46,14 @@ abstract class FilteringSpringBootCondition extends SpringBootCondition
 	@Override
 	public boolean[] match(String[] autoConfigurationClasses,
 			AutoConfigurationMetadata autoConfigurationMetadata) {
+		// 条件评估报告
 		ConditionEvaluationReport report = ConditionEvaluationReport
 				.find(this.beanFactory);
+		// 调用 Condition 接口的 getOutcomes() 方法来进行匹配
 		ConditionOutcome[] outcomes = getOutcomes(autoConfigurationClasses,
 				autoConfigurationMetadata);
 		boolean[] match = new boolean[outcomes.length];
+		// 遍历匹配结果，如果匹配成功则打印日志并记录在报告里。
 		for (int i = 0; i < outcomes.length; i++) {
 			match[i] = (outcomes[i] == null || outcomes[i].isMatch());
 			if (!match[i] && outcomes[i] != null) {

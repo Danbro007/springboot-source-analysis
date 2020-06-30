@@ -49,6 +49,8 @@ class OnClassCondition extends FilteringSpringBootCondition {
 		// Split the work and perform half in a background thread. Using a single
 		// additional thread seems to offer the best performance. More threads make
 		// things worse
+		//  这里经过测试用两个线程去跑的话性能是最好的，大于两个线程性能反而变差。
+		// 把自动配置了分成两部分，尝试再开一个线程，现在有两个线程分别对这两部分的结果进行解析
 		int split = autoConfigurationClasses.length / 2;
 		OutcomesResolver firstHalfResolver = createOutcomesResolver(
 				autoConfigurationClasses, 0, split, autoConfigurationMetadata);

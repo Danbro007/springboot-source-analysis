@@ -83,16 +83,20 @@ class OnBeanCondition extends FilteringSpringBootCondition
 		return ConfigurationPhase.REGISTER_BEAN;
 	}
 
+
 	@Override
 	protected final ConditionOutcome[] getOutcomes(String[] autoConfigurationClasses,
 			AutoConfigurationMetadata autoConfigurationMetadata) {
 		ConditionOutcome[] outcomes = new ConditionOutcome[autoConfigurationClasses.length];
+		// 遍历每个自动配置类，通过以 自动配置类名.ConditionalOnBean 为 key 到 autoConfigurationMetadata 里查找 @ConditionalOnBean 要检查的类
+		// 比如 CacheAutoConfiguration 这个自动配置类，它里面被 @ConditionalOnBean 注解的类是 CacheAspectSupport ，则 getSet() 会返回 CacheAspectSupport 的字符串。
 		for (int i = 0; i < outcomes.length; i++) {
 			String autoConfigurationClass = autoConfigurationClasses[i];
 			if (autoConfigurationClass != null) {
 				Set<String> onBeanTypes = autoConfigurationMetadata
 						.getSet(autoConfigurationClass, "ConditionalOnBean");
 				outcomes[i] = getOutcome(onBeanTypes, ConditionalOnBean.class);
+				// 如果结果为 null 说明自动配置类需要的 bean 存在，则在看看这个 bean 没有被 @ConditionalOnSingleCandidate 注解
 				if (outcomes[i] == null) {
 					Set<String> onSingleCandidateTypes = autoConfigurationMetadata.getSet(
 							autoConfigurationClass, "ConditionalOnSingleCandidate");
@@ -103,7 +107,8 @@ class OnBeanCondition extends FilteringSpringBootCondition
 		}
 		return outcomes;
 	}
-
+	// 如果 @ConditionalOnBean 要检查的 bean 存在则不放入 messing 里，
+	// 如果这个 bean 找不到则会返回一个查找失败的结果
 	private ConditionOutcome getOutcome(Set<String> requiredBeanTypes,
 			Class<? extends Annotation> annotation) {
 		List<String> missing = filter(requiredBeanTypes, ClassNameFilter.MISSING,
