@@ -57,7 +57,9 @@ abstract class FilteringSpringBootCondition extends SpringBootCondition
 		for (int i = 0; i < outcomes.length; i++) {
 			match[i] = (outcomes[i] == null || outcomes[i].isMatch());
 			if (!match[i] && outcomes[i] != null) {
+				// 打印日志
 				logOutcome(autoConfigurationClasses[i], outcomes[i]);
+				// 记录在报告
 				if (report != null) {
 					report.recordConditionEvaluation(autoConfigurationClasses[i], this,
 							outcomes[i]);
@@ -105,7 +107,7 @@ abstract class FilteringSpringBootCondition extends SpringBootCondition
 	protected enum ClassNameFilter {
 
 		PRESENT {
-
+			// 如果存在返回 true
 			@Override
 			public boolean matches(String className, ClassLoader classLoader) {
 				return isPresent(className, classLoader);
@@ -114,7 +116,7 @@ abstract class FilteringSpringBootCondition extends SpringBootCondition
 		},
 
 		MISSING {
-
+			// 如果存在返回 false
 			@Override
 			public boolean matches(String className, ClassLoader classLoader) {
 				return !isPresent(className, classLoader);

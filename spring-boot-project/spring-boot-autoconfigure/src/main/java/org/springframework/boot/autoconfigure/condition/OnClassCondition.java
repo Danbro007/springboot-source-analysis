@@ -160,11 +160,13 @@ class OnClassCondition extends FilteringSpringBootCondition {
 		@Override
 		public ConditionOutcome[] resolveOutcomes() {
 			try {
+				//调用子线程的Join方法，让主线程等待
 				this.thread.join();
 			}
 			catch (InterruptedException ex) {
 				Thread.currentThread().interrupt();
 			}
+			// 返回子线程的调用结果
 			return this.outcomes;
 		}
 
@@ -197,8 +199,8 @@ class OnClassCondition extends FilteringSpringBootCondition {
 			return getOutcomes(this.autoConfigurationClasses, this.start, this.end,
 					this.autoConfigurationMetadata);
 		}
-		// 以 自动配置类名.ConditionalOnClass 为 key 到 autoConfigurationClass 查找自动配置类需要的类的字符串，之后再在 classpath 查看类是否存在
-		// 如果存在则相应的 outcome 为 null
+		// 以 自动配置类名.ConditionalOnClass 为 key 到 autoConfigurationClass 查找自动配置类需要的类的完全限定名，之后再在 classpath 查看类是否存在
+		// 如果存在则相应下标的 outcome 为 null
 		private ConditionOutcome[] getOutcomes(String[] autoConfigurationClasses,
 				int start, int end, AutoConfigurationMetadata autoConfigurationMetadata) {
 			ConditionOutcome[] outcomes = new ConditionOutcome[end - start];
@@ -215,7 +217,7 @@ class OnClassCondition extends FilteringSpringBootCondition {
 			return outcomes;
 		}
 		// 先看有没有逗号，有的话分离然后遍历用 getOutcome() ，用的策略是 ClassNameFilter.MISSING
-		// 如果存在这个类则返回 null
+		// 如果 classpath 上存在这个类则返回 null
 		private ConditionOutcome getOutcome(String candidates) {
 			try {
 				if (!candidates.contains(",")) {
@@ -239,6 +241,7 @@ class OnClassCondition extends FilteringSpringBootCondition {
 
 		private ConditionOutcome getOutcome(String className,
 				ClassNameFilter classNameFilter, ClassLoader classLoader) {
+			// 如果 classpath 存在这个类则返回 false
 			if (classNameFilter.matches(className, classLoader)) {
 				return ConditionOutcome.noMatch(ConditionMessage
 						.forCondition(ConditionalOnClass.class)

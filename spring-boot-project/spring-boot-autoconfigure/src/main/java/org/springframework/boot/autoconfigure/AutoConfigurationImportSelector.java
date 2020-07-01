@@ -132,7 +132,7 @@ public class AutoConfigurationImportSelector
 		configurations = removeDuplicates(configurations);
 		// 获取要排除的自动配置类
 		Set<String> exclusions = getExclusions(annotationMetadata, attributes);
-		// 对 configurations 和 exclusions 进行检查，看看存不存在。
+		//  再次检查要 configurations 里配置类里存不存在 exclusions 里的类并且这个类在 classpath中，如果有则抛出异常。。
 		checkExcludedClasses(configurations, exclusions);
 		// 把 configurations 里删除需要排除的自动配置类
 		configurations.removeAll(exclusions);
@@ -215,6 +215,7 @@ public class AutoConfigurationImportSelector
 		return EnableAutoConfiguration.class;
 	}
 
+	// 再次检查要导入的自定配置类里有没有需要排除的类并且这个类存在，如果有则抛出异常。
 	private void checkExcludedClasses(List<String> configurations,
 			Set<String> exclusions) {
 		List<String> invalidExcludes = new ArrayList<>(exclusions.size());
@@ -327,15 +328,18 @@ public class AutoConfigurationImportSelector
 		String[] value = attributes.getStringArray(name);
 		return Arrays.asList((value != null) ? value : new String[0]);
 	}
-	// 触发自动配置带导入，把导入自动配置类事件发送给监听器
 	private void fireAutoConfigurationImportEvents(List<String> configurations,
 			Set<String> exclusions) {
+		// 到 spring.factories 里找到 AutoConfigurationImportListener 对应的监听器 ConditionEvaluationReportAutoConfigurationImportListener
 		List<AutoConfigurationImportListener> listeners = getAutoConfigurationImportListeners();
 		if (!listeners.isEmpty()) {
+			// 创建一个自动配置类导入事件，然后让刚刚获取的监听器监听
 			AutoConfigurationImportEvent event = new AutoConfigurationImportEvent(this,
 					configurations, exclusions);
 			for (AutoConfigurationImportListener listener : listeners) {
+				// 给监听器设置 environment、beanFactory、resourceLoader等参数
 				invokeAwareMethods(listener);
+				// 让监听器处理自动导入的事件
 				listener.onAutoConfigurationImportEvent(event);
 			}
 		}
@@ -444,7 +448,7 @@ public class AutoConfigurationImportSelector
 					() -> String.format("Only %s implementations are supported, got %s",
 							AutoConfigurationImportSelector.class.getSimpleName(),
 							deferredImportSelector.getClass().getName()));
-			// 获取要导入的自动配置类
+			// 获取要导入的自动配置类并封装成一个 AutoConfigurationEntry 对象
 			AutoConfigurationEntry autoConfigurationEntry = ((AutoConfigurationImportSelector) deferredImportSelector)
 					.getAutoConfigurationEntry(getAutoConfigurationMetadata(),
 							annotationMetadata);

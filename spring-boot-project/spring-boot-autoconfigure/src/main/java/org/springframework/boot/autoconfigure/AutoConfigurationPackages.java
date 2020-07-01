@@ -86,10 +86,17 @@ public abstract class AutoConfigurationPackages {
 	 * you don't call this method directly, but instead rely on the default convention
 	 * where the package name is set from your {@code @EnableAutoConfiguration}
 	 * configuration class or classes.
+	 *
+	 * 注册自动配置类的的包名。后续的调用将把给定的包名添加到已经注册的包名中。你能使用这个方法手动的定义一个
+	 * 将会被给定的 BeanDefinitionRegistry 使用的基础包。通常建议您不要直接调用此方法，而是依赖于默认约定，
+	 * 其中包名是从您的 @EnableAutoConfiguration 配置类或类中设置的。
+	 *
 	 * @param registry the bean definition registry
 	 * @param packageNames the package names to set
 	 */
 	public static void register(BeanDefinitionRegistry registry, String... packageNames) {
+		// 尝试到注册中心获取 AutoConfigurationPackages 的 BD
+		// 在通过 BD 获取它的构造器参数
 		if (registry.containsBeanDefinition(BEAN)) {
 			BeanDefinition beanDefinition = registry.getBeanDefinition(BEAN);
 			ConstructorArgumentValues constructorArguments = beanDefinition

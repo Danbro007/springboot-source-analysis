@@ -89,7 +89,7 @@ class OnBeanCondition extends FilteringSpringBootCondition
 			AutoConfigurationMetadata autoConfigurationMetadata) {
 		ConditionOutcome[] outcomes = new ConditionOutcome[autoConfigurationClasses.length];
 		// 遍历每个自动配置类，通过以 自动配置类名.ConditionalOnBean 为 key 到 autoConfigurationMetadata 里查找 @ConditionalOnBean 要检查的类
-		// 比如 CacheAutoConfiguration 这个自动配置类，它里面被 @ConditionalOnBean 注解的类是 CacheAspectSupport ，则 getSet() 会返回 CacheAspectSupport 的字符串。
+		// 比如 CacheAutoConfiguration 这个自动配置类，它里面被 @ConditionalOnBean 注解的类是 CacheAspectSupport ，则 getSet() 会返回 CacheAspectSupport 的完全限定类名。
 		for (int i = 0; i < outcomes.length; i++) {
 			String autoConfigurationClass = autoConfigurationClasses[i];
 			if (autoConfigurationClass != null) {
