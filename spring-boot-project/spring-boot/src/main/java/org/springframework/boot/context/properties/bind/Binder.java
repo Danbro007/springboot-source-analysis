@@ -48,7 +48,7 @@ import org.springframework.util.Assert;
 /**
  * A container object which Binds objects from one or more
  * {@link ConfigurationPropertySource ConfigurationPropertySources}.
- *
+ * 是一个容器，它绑定了一个或者多个 ConfigurationPropertySource 配置源
  * @author Phillip Webb
  * @author Madhura Bhave
  * @since 2.0.0
@@ -180,12 +180,17 @@ public class Binder {
 	/**
 	 * Bind the specified target {@link Bindable} using this binder's
 	 * {@link ConfigurationPropertySource property sources}.
+	 *
+	 * 使用这个绑定器的 ConfigurationPropertySource 属性源（配置文件）来绑定目标 Bindable
+	 * 先通过属性名返回一个对应的 ConfigurationPropertyName 对象
+	 *
 	 * @param name the configuration property name to bind
 	 * @param target the target bindable
 	 * @param handler the bind handler (may be {@code null})
 	 * @param <T> the bound type
 	 * @return the binding result (never {@code null})
 	 */
+	// 把属性名的前缀转换成相应的 ConfigurationPropertyName 对象再进行绑定
 	public <T> BindResult<T> bind(String name, Bindable<T> target, BindHandler handler) {
 		return bind(ConfigurationPropertyName.of(name), target, handler);
 	}
@@ -193,6 +198,9 @@ public class Binder {
 	/**
 	 * Bind the specified target {@link Bindable} using this binder's
 	 * {@link ConfigurationPropertySource property sources}.
+	 *
+	 * 使用这个绑定器的 ConfigurationPropertySource 属性绑定指定的目标 Bindable
+	 *
 	 * @param name the configuration property name to bind
 	 * @param target the target bindable
 	 * @param handler the bind handler (may be {@code null})
@@ -203,22 +211,27 @@ public class Binder {
 			BindHandler handler) {
 		Assert.notNull(name, "Name must not be null");
 		Assert.notNull(target, "Target must not be null");
+		// 如果没有绑定处理器则创建一个默认的
 		handler = (handler != null) ? handler : BindHandler.DEFAULT;
 		Context context = new Context();
 		T bound = bind(name, target, handler, context, false);
 		return BindResult.of(bound);
 	}
-
+	// 绑定处理器的绑定方法
 	protected final <T> T bind(ConfigurationPropertyName name, Bindable<T> target,
 			BindHandler handler, Context context, boolean allowRecursiveBinding) {
+		// 清空绑定器里的 configurationProperty 属性
 		context.clearConfigurationProperty();
 		try {
+			// 在元素绑定开始但尚未确定结果时调用，默认是返回给定的 target，不做处理。
 			target = handler.onStart(name, target, context);
 			if (target == null) {
 				return null;
 			}
+			// 到配置源找到属性值然后把属性值绑定在绑定器上，返回解析占位符后的返回值。
 			Object bound = bindObject(name, target, handler, context,
 					allowRecursiveBinding);
+			// 处理绑定结果
 			return handleBindResult(name, target, handler, context, bound);
 		}
 		catch (Exception ex) {
@@ -228,10 +241,12 @@ public class Binder {
 
 	private <T> T handleBindResult(ConfigurationPropertyName name, Bindable<T> target,
 			BindHandler handler, Context context, Object result) throws Exception {
+		// 如果属性值不为 null 则执行绑定处理器的成功方法，使用转换器对属性值进行转换
 		if (result != null) {
 			result = handler.onSuccess(name, target, context, result);
 			result = context.getConverter().convert(result, target);
 		}
+		// 执行绑定处理器的绑定结束方法
 		handler.onFinish(name, target, context, result);
 		return context.getConverter().convert(result, target);
 	}
@@ -249,19 +264,23 @@ public class Binder {
 			throw new BindException(name, target, context.getConfigurationProperty(), ex);
 		}
 	}
-
+	// 先到配置源查找属性值如果不存在则看看有没有它的子属性，然后绑定属性到绑定器取出属性值的占位符然后返回属性值
 	private <T> Object bindObject(ConfigurationPropertyName name, Bindable<T> target,
 			BindHandler handler, Context context, boolean allowRecursiveBinding) {
+		// 尝试到所有配置源里查找属性
 		ConfigurationProperty property = findProperty(name, context);
+		// 如果当前属性在配置源里没找到则尝试把当前属性当做父类属性再到配置源查找它的子类属性，如果有他的子类属性说明当前属性是存在的
 		if (property == null && containsNoDescendantOf(context.getSources(), name)) {
 			return null;
 		}
+		// 如果属性类型是 Map、Collection 和数组则会获取聚合类型的绑定器
 		AggregateBinder<?> aggregateBinder = getAggregateBinder(target, context);
 		if (aggregateBinder != null) {
 			return bindAggregate(name, target, handler, context, aggregateBinder);
 		}
 		if (property != null) {
 			try {
+				// 说明属性找到了，开始绑定属性
 				return bindProperty(target, context, property);
 			}
 			catch (ConverterNotFoundException ex) {
@@ -274,6 +293,7 @@ public class Binder {
 				throw ex;
 			}
 		}
+		// 这里说明当前属性有它的子属性，把当前属性名后面追加它的子属性名再到配置源里查找
 		return bindBean(name, target, handler, context, allowRecursiveBinding);
 	}
 
@@ -303,7 +323,7 @@ public class Binder {
 		return context.withIncreasedDepth(
 				() -> aggregateBinder.bind(name, target, elementBinder));
 	}
-
+	// 遍历所有的配置源，到配置源里找要查找的属性，找不到则返回 null
 	private ConfigurationProperty findProperty(ConfigurationPropertyName name,
 			Context context) {
 		if (name.isEmpty()) {
@@ -317,22 +337,26 @@ public class Binder {
 		}
 		return null;
 	}
-
+	// 先对绑定器设置属性（里面有属性名和属性值）
 	private <T> Object bindProperty(Bindable<T> target, Context context,
 			ConfigurationProperty property) {
+		//对绑定器设置属性（里面有属性名和属性值）
 		context.setConfigurationProperty(property);
+		// 得到属性值
 		Object result = property.getValue();
+		// 解析属性值的标志位
 		result = this.placeholdersResolver.resolvePlaceholders(result);
 		result = context.getConverter().convert(result, target);
 		return result;
 	}
-
+	// 绑定 bean
 	private Object bindBean(ConfigurationPropertyName name, Bindable<?> target,
 			BindHandler handler, Context context, boolean allowRecursiveBinding) {
 		if (containsNoDescendantOf(context.getSources(), name)
 				|| isUnbindableBean(name, target, context)) {
 			return null;
 		}
+		// 对属性名追加子属性名然后尝试绑定
 		BeanPropertyBinder propertyBinder = (propertyName, propertyTarget) -> bind(
 				name.append(propertyName), propertyTarget, handler, context, false);
 		Class<?> type = target.getType().resolve(Object.class);
@@ -360,10 +384,11 @@ public class Binder {
 		}
 		return resolved.getName().startsWith("java.");
 	}
-
+	// 可能我们当前的属性名是父类属性，比如 server 是 server.port 的父类属性，尝试在到配置源里找当前属性的子属性有的话返回 false
 	private boolean containsNoDescendantOf(Iterable<ConfigurationPropertySource> sources,
 			ConfigurationPropertyName name) {
 		for (ConfigurationPropertySource source : sources) {
+			// 配置源里有没有是当前属性子属性，既 server.port 是 server 的属性，有的话直接返回 false
 			if (source.containsDescendantOf(name) != ConfigurationPropertyState.ABSENT) {
 				return false;
 			}

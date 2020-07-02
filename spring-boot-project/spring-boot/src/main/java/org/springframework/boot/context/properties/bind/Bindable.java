@@ -30,7 +30,7 @@ import org.springframework.util.ObjectUtils;
 
 /**
  * Source that can be bound by a {@link Binder}.
- *
+ *  能被绑定器绑定的源文件
  * @param <T> the source type
  * @author Phillip Webb
  * @author Madhura Bhave
@@ -41,13 +41,13 @@ import org.springframework.util.ObjectUtils;
 public final class Bindable<T> {
 
 	private static final Annotation[] NO_ANNOTATIONS = {};
-
+	// 被绑定类的类型
 	private final ResolvableType type;
-
+	// 被绑定类型的包装类
 	private final ResolvableType boxedType;
-
+	// 被绑定类的所有属性
 	private final Supplier<T> value;
-
+	// 被绑定类的所有注解
 	private final Annotation[] annotations;
 
 	private Bindable(ResolvableType type, ResolvableType boxedType, Supplier<T> value,
@@ -60,6 +60,9 @@ public final class Bindable<T> {
 
 	/**
 	 * Return the type of the item to bind.
+	 *
+	 * 返回一个 ResolvableType 对象，能通过这个对象访问它的接口、泛型参数和超类。
+	 *
 	 * @return the type being bound
 	 */
 	public ResolvableType getType() {
@@ -145,6 +148,9 @@ public final class Bindable<T> {
 
 	/**
 	 * Create an updated {@link Bindable} instance with the specified annotations.
+	 *
+	 * 通过用指定的注解创建一个更新的 Bindable 的实例
+	 *
 	 * @param annotations the annotations
 	 * @return an updated {@link Bindable}
 	 */
@@ -155,6 +161,9 @@ public final class Bindable<T> {
 
 	/**
 	 * Create an updated {@link Bindable} instance with an existing value.
+	 *
+	 * 使用现有值创建一个更新的 Bindable 实例。
+	 *
 	 * @param existingValue the existing value
 	 * @return an updated {@link Bindable}
 	 */
@@ -238,24 +247,34 @@ public final class Bindable<T> {
 
 	/**
 	 * Create a new {@link Bindable} of the specified type.
+	 *
+	 * 为指定类型创建一个 Bindable 对象
+	 *
 	 * @param <T> the source type
 	 * @param type the type (must not be {@code null})
 	 * @return a {@link Bindable} instance
 	 * @see #of(Class)
 	 */
+	// 尝试对属性类型进行封装
 	public static <T> Bindable<T> of(ResolvableType type) {
 		Assert.notNull(type, "Type must not be null");
+		// 获取属性的包装类
 		ResolvableType boxedType = box(type);
+		// 对属性封装成 Bindable 对象 里面有属性类型和属性包装类型
 		return new Bindable<>(type, boxedType, null, NO_ANNOTATIONS);
 	}
-
+	//
 	private static ResolvableType box(ResolvableType type) {
+		// 对类型进行解析
 		Class<?> resolved = type.resolve();
+		// 判断类型是不是原始类型，比如：如果类型是 Integer 则不是原始类型，如果类型是 int 则是原始类型
+		// 如果是原始类型把他转换成包装类，如：原来是 int 转换成 Integer，原来是 boolean 转换成 Boolean
 		if (resolved != null && resolved.isPrimitive()) {
 			Object array = Array.newInstance(resolved, 1);
 			Class<?> wrapperType = Array.get(array, 0).getClass();
 			return ResolvableType.forClass(wrapperType);
 		}
+		// 如果类型是数组类型，比如 [Ljava.lang.String 这表示是 String 的一维数组，则会进入这个判断，然后把它转换成一个 java.lang.String[] 返回
 		if (resolved != null && resolved.isArray()) {
 			return ResolvableType.forArrayComponent(box(type.getComponentType()));
 		}

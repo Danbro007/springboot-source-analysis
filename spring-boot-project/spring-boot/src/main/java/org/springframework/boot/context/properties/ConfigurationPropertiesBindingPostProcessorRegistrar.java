@@ -26,18 +26,24 @@ import org.springframework.core.type.AnnotationMetadata;
  * {@link ImportBeanDefinitionRegistrar} for binding externalized application properties
  * to {@link ConfigurationProperties} beans.
  *
+ * 把配置文件里的相关属性值绑定给 @ConfigurationProperties 注解的 bean
+ *
  * @author Dave Syer
  * @author Phillip Webb
  */
 public class ConfigurationPropertiesBindingPostProcessorRegistrar
 		implements ImportBeanDefinitionRegistrar {
-
+	// 把 ConfigurationPropertiesBindingPostProcessor 和 ConfigurationBeanFactoryMetadata 注册进 IOC 容器
 	@Override
 	public void registerBeanDefinitions(AnnotationMetadata importingClassMetadata,
 			BeanDefinitionRegistry registry) {
+		// 如果 IOC 容器里没有 ConfigurationPropertiesBindingPostProcessor 这个 bean 则把它 和 ConfigurationBeanFactoryMetadata 则先注册进 IOC 容器里
 		if (!registry.containsBeanDefinition(
 				ConfigurationPropertiesBindingPostProcessor.BEAN_NAME)) {
+			// ConfigurationPropertiesBindingPostProcessor 是 Bean后置处理器,用来绑定配置文件里的属性给
+			// @ConfigurationProperties 注解的类
 			registerConfigurationPropertiesBindingPostProcessor(registry);
+			// ConfigurationBeanFactoryMetadata 是 BeanFactory后置处理器
 			registerConfigurationBeanFactoryMetadata(registry);
 		}
 	}

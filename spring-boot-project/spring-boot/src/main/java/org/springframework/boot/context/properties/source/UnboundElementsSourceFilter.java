@@ -31,6 +31,10 @@ import org.springframework.core.env.StandardEnvironment;
  * systemEnvironment or systemProperties property source, it will not be considered for
  * unbound element failures.
  *
+ * 在确定未绑定元素时，用于确定是否应该包含 ConfigurationPropertySource。
+ * 如果底层的属性源是一个系统环境或者系统属性的属性源，将不会把这个认为是未绑定元素失败。
+ *
+ *
  * @author Madhura Bhave
  * @since 2.0.0
  */

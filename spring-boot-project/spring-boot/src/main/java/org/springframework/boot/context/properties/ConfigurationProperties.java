@@ -63,6 +63,9 @@ public @interface ConfigurationProperties {
 	 * Flag to indicate that when binding to this object invalid fields should be ignored.
 	 * Invalid means invalid according to the binder that is used, and usually this means
 	 * fields of the wrong type (or that cannot be coerced into the correct type).
+	 *
+	 *  表示绑定到此对象时应忽略无效字段的标志。根据使用的绑定器来判断无效，无效意味着这些属性是错误的类型（(或不能强制为正确的类型）。
+	 *
 	 * @return the flag value (default false)
 	 */
 	boolean ignoreInvalidFields() default false;
@@ -70,6 +73,9 @@ public @interface ConfigurationProperties {
 	/**
 	 * Flag to indicate that when binding to this object unknown fields should be ignored.
 	 * An unknown field could be a sign of a mistake in the Properties.
+	 *
+	 * 表示当绑定这个对象的未知属性应该被忽略的标志。未知字段可能是属性错误的标志。
+	 *
 	 * @return the flag value (default true)
 	 */
 	boolean ignoreUnknownFields() default true;

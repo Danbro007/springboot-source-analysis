@@ -31,6 +31,10 @@ import org.springframework.util.Assert;
  * must be lower-case and must start with an alpha-numeric character. The "{@code -}" is
  * used purely for formatting, i.e. "{@code foo-bar}" and "{@code foobar}" are considered
  * equivalent.
+ *
+ * 由符号 . 分隔的元素组成的配置属性名（例如：spring.profiles.active ）。用户创建的属性名可以包括 【a-z】
+ * 【0-9】 和 符号 “-”，他们必须是小写的并且开头是字母数字字符。符号 “-” 纯粹用于格式化的。比如："foo-bar" 等同于 “foobar”。
+ *
  * <p>
  * The "{@code [}" and "{@code ]}" characters may be used to indicate an associative
  * index(i.e. a {@link Map} key or a {@link Collection} index. Indexes names are not
@@ -187,6 +191,9 @@ public final class ConfigurationPropertyName
 	/**
 	 * Create a new {@link ConfigurationPropertyName} by appending the given element
 	 * value.
+	 *
+	 * 对属性名进行追加，比如：原来的属性是 server，现在我们要在后面追加 port，最后会生成 server.port。
+	 *
 	 * @param elementValue the single element value to append
 	 * @return a new {@link ConfigurationPropertyName}
 	 * @throws InvalidConfigurationPropertyNameException if elementValue is not valid
@@ -229,14 +236,25 @@ public final class ConfigurationPropertyName
 	/**
 	 * Returns {@code true} if this element is an ancestor (immediate or nested parent) of
 	 * the specified name.
+	 *
+	 * 判断当前属性是不是被指定的属性的父属性
+	 *
+	 * 例如有个属性 spring.profiles 我们记为 a ,还有一个属性 spring.profiles.active 我们记为 b
+	 * 先比较元素数量 a 的数量 2，b 的数量为 3，a.size < b.size 说明 a 是 b 的祖先属性
+	 * 接着在逐一比较 a 和 b 里的元素。如果发现一个不相等就返回 false。
+	 * 全部通过则返回 true。
+	 *
 	 * @param name the name to check
 	 * @return {@code true} if this name is an ancestor
 	 */
 	public boolean isAncestorOf(ConfigurationPropertyName name) {
 		Assert.notNull(name, "Name must not be null");
+		// 如果当前属性的元素长度大于等于要判断的的属性长度，
+		// 则说明给定的属性不是当前属性的祖先。
 		if (this.getNumberOfElements() >= name.getNumberOfElements()) {
 			return false;
 		}
+		// 逐一比对，如果不相等返回false
 		for (int i = 0; i < this.elements.getSize(); i++) {
 			if (!elementEquals(this.elements, name.elements, i)) {
 				return false;
@@ -403,6 +421,9 @@ public final class ConfigurationPropertyName
 
 	/**
 	 * Return a {@link ConfigurationPropertyName} for the specified string.
+	 *
+	 * 返回指定的属性名对应的 ConfigurationPropertyName 对象
+	 *
 	 * @param name the source name
 	 * @return a {@link ConfigurationPropertyName} instance
 	 * @throws InvalidConfigurationPropertyNameException if the name is not valid
@@ -413,6 +434,9 @@ public final class ConfigurationPropertyName
 
 	/**
 	 * Return a {@link ConfigurationPropertyName} for the specified string.
+	 *
+	 * 根据属性名返回一个 ConfigurationPropertyName 对象
+	 *
 	 * @param name the source name
 	 * @param returnNullIfInvalid if null should be returned if the name is not valid
 	 * @return a {@link ConfigurationPropertyName} instance

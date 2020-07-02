@@ -65,21 +65,29 @@ class ConfigurationPropertiesBinder {
 	ConfigurationPropertiesBinder(ApplicationContext applicationContext,
 			String validatorBeanName) {
 		this.applicationContext = applicationContext;
+		// 将 applicationContext 和 配置文件 封装到 PropertySourcesDeducer
 		this.propertySources = new PropertySourcesDeducer(applicationContext)
 				.getPropertySources();
+		// 设置属性校验器
 		this.configurationPropertiesValidator = getConfigurationPropertiesValidator(
 				applicationContext, validatorBeanName);
+		// 检查实现JSR-303规范的bean校验器相关类在classpath中是否存在
 		this.jsr303Present = ConfigurationPropertiesJsr303Validator
 				.isJsr303Present(applicationContext);
 	}
-
+	// 先获取注解(里面包含设置的 @ConfigurationProperties 属性)和校验器，
+	// 创建绑定处理器，给绑定器设置校验器，根据注解的属性配置不同的绑定处理器
+	// 使用绑定器开始对目标类绑定属性
 	public void bind(Bindable<?> target) {
+		// 获取 @ConfigurationProperties 注解，如：属性名的前缀、ignoreInvalidFields等
 		ConfigurationProperties annotation = target
 				.getAnnotation(ConfigurationProperties.class);
 		Assert.state(annotation != null,
 				() -> "Missing @ConfigurationProperties on " + target);
 		List<Validator> validators = getValidators(target);
+		// 获取绑定处理器，通过 @ConfigurationProperties 里的属性配置不同的绑定处理器，然后给它配置校验器
 		BindHandler bindHandler = getBindHandler(annotation, validators);
+		// 用绑定器绑定属性
 		getBinder().bind(annotation.prefix(), target, bindHandler);
 	}
 
@@ -112,21 +120,31 @@ class ConfigurationPropertiesBinder {
 		}
 		return this.jsr303Validator;
 	}
-
+	// 获取绑定处理器
 	private BindHandler getBindHandler(ConfigurationProperties annotation,
 			List<Validator> validators) {
+		// 一开始先创建一个能忽略 ConverterNotFoundException 异常的绑定处理器
 		BindHandler handler = new IgnoreTopLevelConverterNotFoundBindHandler();
+		// 如果 @ConfigurationProperties 注解的 ignoreInvalidFields 属性为 true
+		// 则说明可以忽略无效的配置属性例如类型错误，此时新建一个IgnoreErrorsBindHandler对象
 		if (annotation.ignoreInvalidFields()) {
+			// IgnoreErrorsBindHandler 是能忽略绑定错误的绑定处理器
 			handler = new IgnoreErrorsBindHandler(handler);
 		}
+		// 如果 @ConfigurationProperties 注解的 ignoreUnknownFields 属性为 false
+		// 则说明未知的属性不能被忽略
 		if (!annotation.ignoreUnknownFields()) {
+			// 创建一个未绑定元素过滤器
 			UnboundElementsSourceFilter filter = new UnboundElementsSourceFilter();
+			// NoUnboundElementsBindHandler 是强制所有的属性都要被绑定
 			handler = new NoUnboundElementsBindHandler(handler, filter);
 		}
+		// 如果有校验器则创建一个 ValidationBindHandler 对象，来对绑定结果校验。
 		if (!validators.isEmpty()) {
 			handler = new ValidationBindHandler(handler,
 					validators.toArray(new Validator[0]));
 		}
+		// 应用 ConfigurationPropertiesBindHandlerAdvisor ，对处理器进行增强
 		for (ConfigurationPropertiesBindHandlerAdvisor advisor : getBindHandlerAdvisors()) {
 			handler = advisor.apply(handler);
 		}
@@ -138,7 +156,7 @@ class ConfigurationPropertiesBinder {
 				.getBeanProvider(ConfigurationPropertiesBindHandlerAdvisor.class)
 				.orderedStream().collect(Collectors.toList());
 	}
-
+	// 如果绑定器不存在则创建一个新的绑定器配置上配置属性源、占位符解析器、参数转换器 和 属性编辑器初始化器
 	private Binder getBinder() {
 		if (this.binder == null) {
 			this.binder = new Binder(getConfigurationPropertySources(),

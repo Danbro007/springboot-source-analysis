@@ -27,6 +27,8 @@ import org.springframework.core.convert.ConverterNotFoundException;
  * {@link BindHandler} that can be used to ignore top-level
  * {@link ConverterNotFoundException}s.
  *
+ * 用来忽略 ConverterNotFoundException 异常的绑定处理器
+ *
  * @author Madhura Bhave
  * @since 2.0.1
  */
@@ -46,6 +48,7 @@ public class IgnoreTopLevelConverterNotFoundBindHandler extends AbstractBindHand
 	public IgnoreTopLevelConverterNotFoundBindHandler(BindHandler parent) {
 	}
 
+	// 处理 ConverterNotFoundException 异常
 	@Override
 	public Object onFailure(ConfigurationPropertyName name, Bindable<?> target,
 			BindContext context, Exception error) throws Exception {

@@ -25,6 +25,8 @@ import org.springframework.boot.context.properties.source.ConfigurationPropertyS
 /**
  * Internal strategy used by {@link Binder} to bind aggregates (Maps, Lists, Arrays).
  *
+ * 使用绑定来绑定 Map、List、Arrays的 策略
+ *
  * @param <T> the type being bound
  * @author Phillip Webb
  * @author Madhura Bhave

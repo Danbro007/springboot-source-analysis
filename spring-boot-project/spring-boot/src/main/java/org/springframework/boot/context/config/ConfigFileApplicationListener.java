@@ -584,7 +584,8 @@ public class ConfigFileApplicationListener
 				Binder binder = new Binder(
 						ConfigurationPropertySources.from(propertySource),
 						this.placeholdersResolver);
-				return new Document(propertySource,
+ 				return new Document(propertySource,
+						// 先尝试到 spring.profiles 里获取属性，找不到则到spring.profiles.active 和 spring.profiles.include 设置的文件里找
 						binder.bind("spring.profiles", STRING_ARRAY).orElse(null),
 						getProfiles(binder, ACTIVE_PROFILES_PROPERTY),
 						getProfiles(binder, INCLUDE_PROFILES_PROPERTY));

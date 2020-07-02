@@ -43,12 +43,17 @@ import org.springframework.util.StringUtils;
  * to the class name (thus an application context usually only contains one
  * {@link ConfigurationProperties} bean of each unique type).
  *
+ * 导入选择器，用于设置外部属性（如配置文件 application.properties）到配置类的绑定(参见{@link ConfigurationProperties})。
+ * 它要么注册一个 ConfigurationProperties bean 要么不注册，取决于 @EnableConfigurationProperties 注解是否显式声明。
+ * 如果没有声明，那一个 bean 后置处理器仍然会为 注解是外部配置的 bean 提供支持。如果显示声明了，会以 id 为完全限定类名注册一个 BD
+ * （因此，应用程序上下文通常只包含每种独特类型的一个 ConfigurationProperties bean）
+ *
  * @author Dave Syer
  * @author Christian Dupuis
  * @author Stephane Nicoll
  */
 class EnableConfigurationPropertiesImportSelector implements ImportSelector {
-
+	// 注册 ConfigurationPropertiesBeanRegistrar 和 ConfigurationPropertiesBindingPostProcessorRegistrar 到 IOC 容器
 	private static final String[] IMPORTS = {
 			ConfigurationPropertiesBeanRegistrar.class.getName(),
 			ConfigurationPropertiesBindingPostProcessorRegistrar.class.getName() };
@@ -60,17 +65,22 @@ class EnableConfigurationPropertiesImportSelector implements ImportSelector {
 
 	/**
 	 * {@link ImportBeanDefinitionRegistrar} for configuration properties support.
+	 *
+	 * 它的作用就是把当前类里的 @EnableConfigurationProperties 注解里的类转换 BD 对象存入 BD Map 里
+	 * 之后会把这些类注册进 IOC 容器里。
+	 *
 	 */
 	public static class ConfigurationPropertiesBeanRegistrar
 			implements ImportBeanDefinitionRegistrar {
-
+		// 遍历所有 @EnableConfigurationProperties 里的类把它们转换成 BD 对象放入 BD Map 里
 		@Override
 		public void registerBeanDefinitions(AnnotationMetadata metadata,
 				BeanDefinitionRegistry registry) {
 			getTypes(metadata).forEach((type) -> register(registry,
 					(ConfigurableListableBeanFactory) registry, type));
 		}
-
+		// 获取当前类里所有 @EnableConfigurationProperties 注解的类并转换成 List 返回
+		// 例如：@EnableConfigurationProperties(ServerProperties.class) 则获取的是 ServerProperties
 		private List<Class<?>> getTypes(AnnotationMetadata metadata) {
 			MultiValueMap<String, Object> attributes = metadata
 					.getAllAnnotationAttributes(
@@ -84,10 +94,11 @@ class EnableConfigurationPropertiesImportSelector implements ImportSelector {
 					.map((o) -> (Class<?>) o).filter((type) -> void.class != type)
 					.collect(Collectors.toList());
 		}
-
+		// 以类的完全限定名为key 把
 		private void register(BeanDefinitionRegistry registry,
 				ConfigurableListableBeanFactory beanFactory, Class<?> type) {
 			String name = getName(type);
+			// 通过 BeanName 在 BeanFactory 里查看是否有这个 bean，没有的话注册进 BD Map 里
 			if (!containsBeanDefinition(beanFactory, name)) {
 				registerBeanDefinition(registry, name, type);
 			}
@@ -113,7 +124,7 @@ class EnableConfigurationPropertiesImportSelector implements ImportSelector {
 			}
 			return false;
 		}
-
+		// 为 bean 创建一个 BD 对象 然后注册进 BD Map 里
 		private void registerBeanDefinition(BeanDefinitionRegistry registry, String name,
 				Class<?> type) {
 			assertHasAnnotation(type);

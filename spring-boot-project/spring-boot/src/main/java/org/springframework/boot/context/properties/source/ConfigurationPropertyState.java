@@ -23,6 +23,8 @@ import org.springframework.util.Assert;
 /**
  * The state of content from a {@link ConfigurationPropertySource}.
  *
+ * 表示 ConfigurationPropertySource（配置文件源） 内容的状态
+ *
  * @author Phillip Webb
  * @since 2.0.0
  */
@@ -31,24 +33,36 @@ public enum ConfigurationPropertyState {
 	/**
 	 * The {@link ConfigurationPropertySource} has at least one matching
 	 * {@link ConfigurationProperty}.
+	 *
+	 * ConfigurationPropertySource 匹配至少一个 ConfigurationProperty
+	 *
 	 */
 	PRESENT,
 
 	/**
 	 * The {@link ConfigurationPropertySource} has no matching
 	 * {@link ConfigurationProperty ConfigurationProperties}.
+	 *
+	 * ConfigurationPropertySource 匹配一个 ConfigurationProperty 都没有匹配上
+	 *
 	 */
 	ABSENT,
 
 	/**
 	 * It's not possible to determine if {@link ConfigurationPropertySource} has matching
 	 * {@link ConfigurationProperty ConfigurationProperties} or not.
+	 *
+	 * 无法确定 ConfigurationPropertySource 是否能匹配上 ConfigurationProperty
+	 *
 	 */
 	UNKNOWN;
 
 	/**
 	 * Search the given iterable using a predicate to determine if content is
 	 * {@link #PRESENT} or {@link #ABSENT}.
+	 *
+	 * 遍历配置源里的所有属性，到里面找给定的属性是否存在如果有则返回 PRESENT 没有找到则返回 ABSENT
+	 *
 	 * @param <T> the data type
 	 * @param source the source iterable to search
 	 * @param predicate the predicate used to test for presence

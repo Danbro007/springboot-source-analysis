@@ -34,11 +34,17 @@ import org.springframework.util.ObjectUtils;
  */
 public final class ConfigurationProperty
 		implements OriginProvider, Comparable<ConfigurationProperty> {
-
+	/**
+	 * 属性名
+	 */
 	private final ConfigurationPropertyName name;
-
+	/**
+	 * 属性值
+	 */
 	private final Object value;
-
+	/**
+	 * 文件的原始信息，比如文件的来源路径等
+	 */
 	private final Origin origin;
 
 	public ConfigurationProperty(ConfigurationPropertyName name, Object value,

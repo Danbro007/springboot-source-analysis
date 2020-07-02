@@ -34,6 +34,9 @@ import org.springframework.util.ReflectionUtils;
  * Utility class to memorize {@code @Bean} definition meta data during initialization of
  * the bean factory.
  *
+ *
+ * 在 bean工厂 初始化期间存储 @Bean 定义的元数据。
+ *
  * @author Dave Syer
  * @since 1.1.0
  */
@@ -49,15 +52,21 @@ public class ConfigurationBeanFactoryMetadata implements BeanFactoryPostProcesso
 
 	private final Map<String, FactoryMetadata> beansFactoryMetadata = new HashMap<>();
 
+
+	// 获取每个 BD 的工厂方法和 BeanName 如果 beanName 和工厂方法都存在，则把它以 beanName 为 key ，
+	// beanName 和工厂方法封装成 FactoryMetadata 的对象为 value 放入 beansFactoryMetadata 里
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory)
 			throws BeansException {
 		this.beanFactory = beanFactory;
 		for (String name : beanFactory.getBeanDefinitionNames()) {
 			BeanDefinition definition = beanFactory.getBeanDefinition(name);
+			// 工厂方法名：一般是注解@Bean的方法名
 			String method = definition.getFactoryMethodName();
+			// 工厂bean名：一般是注解@Configuration的类名
 			String bean = definition.getFactoryBeanName();
 			if (method != null && bean != null) {
+				// 以 beanName 为 key ，beanName 和工厂方法封装成 FactoryMetadata 的对象为 value 放入 beansFactoryMetadata 里
 				this.beansFactoryMetadata.put(name, new FactoryMetadata(bean, method));
 			}
 		}
