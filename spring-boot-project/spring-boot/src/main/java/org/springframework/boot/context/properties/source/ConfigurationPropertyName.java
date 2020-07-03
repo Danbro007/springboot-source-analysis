@@ -239,10 +239,15 @@ public final class ConfigurationPropertyName
 	 *
 	 * 判断当前属性是不是被指定的属性的父属性
 	 *
-	 * 例如有个属性 spring.profiles 我们记为 a ,还有一个属性 spring.profiles.active 我们记为 b
-	 * 先比较元素数量 a 的数量 2，b 的数量为 3，a.size < b.size 说明 a 是 b 的祖先属性
-	 * 接着在逐一比较 a 和 b 里的元素。如果发现一个不相等就返回 false。
-	 * 全部通过则返回 true。
+	 * 例如有个属性 server.profiles 我们记为 a ,还有一个属性 spring.profiles.active 我们记为 b
+	 * 先比较元素数量 a 的数量 2，b 的数量为 3，a.size < b.size 说明 a 可能是 b 的祖先属性。
+	 * 接着在逐一比较 a 和 b 里的属性名的字符串数组。比较次数是 a 的 字符串数组长度。
+	 * 我们把 a 的字符串数组 称为 ArrayA = {"server","profiles"},b 的字符串数组 称为 ArrayB = {"server","profiles","active"}
+	 * 比较次数 2
+	 * 第一次 ArrayA[0].equal(ArrayB[0]) == true
+	 * 第二次 ArrayA[1].equal(ArrayB[1]) == true
+	 * 最后返回 true
+	 * 如果发现一个不相等就返回 false。
 	 *
 	 * @param name the name to check
 	 * @return {@code true} if this name is an ancestor

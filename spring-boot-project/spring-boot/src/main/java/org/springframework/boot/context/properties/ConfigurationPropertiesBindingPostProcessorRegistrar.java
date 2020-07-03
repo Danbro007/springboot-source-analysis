@@ -26,7 +26,7 @@ import org.springframework.core.type.AnnotationMetadata;
  * {@link ImportBeanDefinitionRegistrar} for binding externalized application properties
  * to {@link ConfigurationProperties} beans.
  *
- * 把配置文件里的相关属性值绑定给 @ConfigurationProperties 注解的 bean
+ * ImportBeanDefinitionRegistrar 把配置文件里的相关属性值绑定给 @ConfigurationProperties 标注的 bean
  *
  * @author Dave Syer
  * @author Phillip Webb

@@ -199,7 +199,7 @@ public class Binder {
 	 * Bind the specified target {@link Bindable} using this binder's
 	 * {@link ConfigurationPropertySource property sources}.
 	 *
-	 * 使用这个绑定器的 ConfigurationPropertySource 属性绑定指定的目标 Bindable
+	 * 使用这个绑定器的属性源来绑定指定的目标。
 	 *
 	 * @param name the configuration property name to bind
 	 * @param target the target bindable
@@ -217,7 +217,7 @@ public class Binder {
 		T bound = bind(name, target, handler, context, false);
 		return BindResult.of(bound);
 	}
-	// 绑定处理器的绑定方法
+	// 调用绑定处理器的绑定方法
 	protected final <T> T bind(ConfigurationPropertyName name, Bindable<T> target,
 			BindHandler handler, Context context, boolean allowRecursiveBinding) {
 		// 清空绑定器里的 configurationProperty 属性
@@ -231,7 +231,7 @@ public class Binder {
 			// 到配置源找到属性值然后把属性值绑定在绑定器上，返回解析占位符后的返回值。
 			Object bound = bindObject(name, target, handler, context,
 					allowRecursiveBinding);
-			// 处理绑定结果
+			// 处理绑定结果，执行 BinderHandler 的 onSuccess()、onFinish() 方法
 			return handleBindResult(name, target, handler, context, bound);
 		}
 		catch (Exception ex) {
@@ -349,20 +349,23 @@ public class Binder {
 		result = context.getConverter().convert(result, target);
 		return result;
 	}
-	// 绑定 bean
+
 	private Object bindBean(ConfigurationPropertyName name, Bindable<?> target,
 			BindHandler handler, Context context, boolean allowRecursiveBinding) {
+		// 再次检查当前属性有没有子属性或者当前属性的 bean 还没有被绑定的
 		if (containsNoDescendantOf(context.getSources(), name)
 				|| isUnbindableBean(name, target, context)) {
 			return null;
 		}
-		// 对属性名追加子属性名然后尝试绑定
+		// 创建一个 BeanPropertyBinder 实现类对象 它实现了 bindProperty() 方法
 		BeanPropertyBinder propertyBinder = (propertyName, propertyTarget) -> bind(
 				name.append(propertyName), propertyTarget, handler, context, false);
+		// 获取 @ConfigurationProperties 注解的类
 		Class<?> type = target.getType().resolve(Object.class);
 		if (!allowRecursiveBinding && context.hasBoundBean(type)) {
 			return null;
 		}
+		//  遍历 BEAN_BINDERS 里的 JavaBeanBinder 对象,调用 bind() 方法
 		return context.withBean(type, () -> {
 			Stream<?> boundBeans = BEAN_BINDERS.stream()
 					.map((b) -> b.bind(name, target, context, propertyBinder));
@@ -388,7 +391,7 @@ public class Binder {
 	private boolean containsNoDescendantOf(Iterable<ConfigurationPropertySource> sources,
 			ConfigurationPropertyName name) {
 		for (ConfigurationPropertySource source : sources) {
-			// 配置源里有没有是当前属性子属性，既 server.port 是 server 的属性，有的话直接返回 false
+			// 配置源里有没有是当前属性的子属性，既 server.port 是 server 的子属性，有的话直接返回 false
 			if (source.containsDescendantOf(name) != ConfigurationPropertyState.ABSENT) {
 				return false;
 			}

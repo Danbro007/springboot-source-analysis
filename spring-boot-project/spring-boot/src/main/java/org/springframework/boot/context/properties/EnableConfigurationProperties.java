@@ -27,9 +27,15 @@ import org.springframework.context.annotation.Import;
 
 /**
  * Enable support for {@link ConfigurationProperties} annotated beans.
+ *
+ * 开启对 @ConfigurationProperties 注解的 bean 的支持
+ *
  * {@link ConfigurationProperties} beans can be registered in the standard way (for
  * example using {@link Bean @Bean} methods) or, for convenience, can be specified
  * directly on this annotation.
+ *
+ * @ConfigurationProperties 注解的 bean 能在标准方式（比如使用过 @Bean 方法）里被注册，
+ * 或者为了方便直接通过 @ConfigurationProperties 注解来指定。
  *
  * @author Dave Syer
  */

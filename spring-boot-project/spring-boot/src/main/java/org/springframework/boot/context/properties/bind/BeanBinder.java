@@ -21,7 +21,7 @@ import org.springframework.boot.context.properties.source.ConfigurationPropertyN
 
 /**
  * Internal strategy used by {@link Binder} to bind beans.
- *
+ * 使用 Binder 去绑定 bean 的内部策略
  * @author Phillip Webb
  * @author Madhura Bhave
  */

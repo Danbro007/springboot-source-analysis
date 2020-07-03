@@ -53,7 +53,7 @@ public class ConfigurationBeanFactoryMetadata implements BeanFactoryPostProcesso
 	private final Map<String, FactoryMetadata> beansFactoryMetadata = new HashMap<>();
 
 
-	// 获取每个 BD 的工厂方法和 BeanName 如果 beanName 和工厂方法都存在，则把它以 beanName 为 key ，
+	// 获取每个 BD 的工厂方法和 BeanName ，如果 beanName 和工厂方法都存在，则把它以 beanName 为 key ，
 	// beanName 和工厂方法封装成 FactoryMetadata 的对象为 value 放入 beansFactoryMetadata 里
 	@Override
 	public void postProcessBeanFactory(ConfigurableListableBeanFactory beanFactory)
@@ -61,9 +61,9 @@ public class ConfigurationBeanFactoryMetadata implements BeanFactoryPostProcesso
 		this.beanFactory = beanFactory;
 		for (String name : beanFactory.getBeanDefinitionNames()) {
 			BeanDefinition definition = beanFactory.getBeanDefinition(name);
-			// 工厂方法名：一般是注解@Bean的方法名
+			// 工厂方法名：一般是注解 @Bean 的方法名
 			String method = definition.getFactoryMethodName();
-			// 工厂bean名：一般是注解@Configuration的类名
+			// 工厂bean名：一般是注解 @Configuration 的类名
 			String bean = definition.getFactoryBeanName();
 			if (method != null && bean != null) {
 				// 以 beanName 为 key ，beanName 和工厂方法封装成 FactoryMetadata 的对象为 value 放入 beansFactoryMetadata 里

@@ -47,15 +47,18 @@ class JavaBeanBinder implements BeanBinder {
 			BeanPropertyBinder propertyBinder) {
 		// 先判断属性存不存在
 		boolean hasKnownBindableProperties = hasKnownBindableProperties(name, context);
-		// 把 target 转换成 Bean 对象
+		// 把 target 封装 Bean 对象,Bean 是用来被绑定的。
+		// 比如是 ServerProperties 的 bean，则包括它的所有属性的 set()、get()、属性名、属性类型。
+		// ServerProperties 的类型
 		Bean<T> bean = Bean.get(target, hasKnownBindableProperties);
 		if (bean == null) {
 			return null;
 		}
-		// 从 target 里获取被绑定的类的实例 例如：ServerProperties 的实例
+		// 获取 BeanSupplier 的实现类用于生成被绑定类的实例 例如：ServerProperties 的实例
 		BeanSupplier<T> beanSupplier = bean.getSupplier(target);
-		// 为被绑定类的实例绑定属性，绑定成功返回 true 失败返回 false
+		// 遍历被绑定类的所有属性，把当前属性名追加在属性名前缀后面然后到配置源里查找属性，找到的话调用属性对应的 set 方法 设置属性。
 		boolean bound = bind(propertyBinder, bean, beanSupplier);
+		// 返回被绑定类的实例
 		return (bound ? beanSupplier.get() : null);
 	}
 
@@ -113,11 +116,11 @@ class JavaBeanBinder implements BeanBinder {
 	private static class Bean<T> {
 		// 缓存的bean
 		private static Bean<?> cached;
-
+		// 类型
 		private final Class<?> type;
-
+		// 可解析的类型
 		private final ResolvableType resolvableType;
-
+		// 所有属性的信息，例如：属性的 set()、get()、属性名等
 		private final Map<String, BeanProperty> properties = new LinkedHashMap<>();
 
 		Bean(ResolvableType resolvableType, Class<?> type) {

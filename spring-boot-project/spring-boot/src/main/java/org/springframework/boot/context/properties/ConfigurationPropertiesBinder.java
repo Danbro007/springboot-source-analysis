@@ -45,6 +45,8 @@ import org.springframework.validation.annotation.Validated;
  * Internal class by the {@link ConfigurationPropertiesBindingPostProcessor} to handle the
  * actual {@link ConfigurationProperties} binding.
  *
+ * ConfigurationPropertiesBindingPostProcessor 的内部类来处理 ConfigurationProperties 标注的类的实际绑定。
+ *
  * @author Stephane Nicoll
  * @author Phillip Webb
  */
@@ -79,7 +81,7 @@ class ConfigurationPropertiesBinder {
 	// 创建绑定处理器，给绑定器设置校验器，根据注解的属性配置不同的绑定处理器
 	// 使用绑定器开始对目标类绑定属性
 	public void bind(Bindable<?> target) {
-		// 获取 @ConfigurationProperties 注解，如：属性名的前缀、ignoreInvalidFields等
+		// 获取 @ConfigurationProperties 注解
 		ConfigurationProperties annotation = target
 				.getAnnotation(ConfigurationProperties.class);
 		Assert.state(annotation != null,

@@ -53,7 +53,7 @@ import org.springframework.util.StringUtils;
  * @author Stephane Nicoll
  */
 class EnableConfigurationPropertiesImportSelector implements ImportSelector {
-	// 注册 ConfigurationPropertiesBeanRegistrar 和 ConfigurationPropertiesBindingPostProcessorRegistrar 到 IOC 容器
+	// 【1】注册 ConfigurationPropertiesBeanRegistrar 和 ConfigurationPropertiesBindingPostProcessorRegistrar 到 IOC 容器
 	private static final String[] IMPORTS = {
 			ConfigurationPropertiesBeanRegistrar.class.getName(),
 			ConfigurationPropertiesBindingPostProcessorRegistrar.class.getName() };
@@ -72,14 +72,14 @@ class EnableConfigurationPropertiesImportSelector implements ImportSelector {
 	 */
 	public static class ConfigurationPropertiesBeanRegistrar
 			implements ImportBeanDefinitionRegistrar {
-		// 遍历所有 @EnableConfigurationProperties 里的类把它们转换成 BD 对象放入 BD Map 里
+		// 【2】把当前自动配置类里 @EnableConfigurationProperties 标注的类注册进入 IOC 容器里
 		@Override
 		public void registerBeanDefinitions(AnnotationMetadata metadata,
 				BeanDefinitionRegistry registry) {
 			getTypes(metadata).forEach((type) -> register(registry,
 					(ConfigurableListableBeanFactory) registry, type));
 		}
-		// 获取当前类里所有 @EnableConfigurationProperties 注解的类并转换成 List 返回
+		// 【3】获取当前类里所有 @EnableConfigurationProperties 注解的类并转换成 List 返回
 		// 例如：@EnableConfigurationProperties(ServerProperties.class) 则获取的是 ServerProperties
 		private List<Class<?>> getTypes(AnnotationMetadata metadata) {
 			MultiValueMap<String, Object> attributes = metadata
@@ -124,7 +124,7 @@ class EnableConfigurationPropertiesImportSelector implements ImportSelector {
 			}
 			return false;
 		}
-		// 为 bean 创建一个 BD 对象 然后注册进 BD Map 里
+		// 为 bean 创建一个 BD 对象 然后注册进 IOC 容器里
 		private void registerBeanDefinition(BeanDefinitionRegistry registry, String name,
 				Class<?> type) {
 			assertHasAnnotation(type);
