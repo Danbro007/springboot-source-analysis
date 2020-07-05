@@ -33,9 +33,14 @@ import org.springframework.util.ErrorHandler;
 
 /**
  * {@link SpringApplicationRunListener} to publish {@link SpringApplicationEvent}s.
+ *
+ * 来发布 SpringApplicationEvent 事件
+ *
  * <p>
  * Uses an internal {@link ApplicationEventMulticaster} for the events that are fired
  * before the context is actually refreshed.
+ *
+ * 为了在实际刷新上下文之前触发事件可以使用一个内部的 ApplicationEventMulticaster（可以管理多个 ApplicationListener，并且对它们发布时间。 ）
  *
  * @author Phillip Webb
  * @author Stephane Nicoll

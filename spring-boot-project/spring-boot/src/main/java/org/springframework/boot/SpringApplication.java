@@ -192,11 +192,15 @@ public class SpringApplication {
 	private static final String SYSTEM_PROPERTY_JAVA_AWT_HEADLESS = "java.awt.headless";
 
 	private static final Log logger = LogFactory.getLog(SpringApplication.class);
-
+	/**
+	 * SpringBoot的启动类即包含main函数的主类
+	 */
 	private Set<Class<?>> primarySources;
 
 	private Set<String> sources = new LinkedHashSet<>();
-
+	/**
+	 * 主启动类
+	 */
 	private Class<?> mainApplicationClass;
 
 	private Banner.Mode bannerMode = Banner.Mode.CONSOLE;
@@ -208,7 +212,9 @@ public class SpringApplication {
 	private boolean addConversionService = true;
 
 	private Banner banner;
-
+	/**
+	 * 资源加载器
+	 */
 	private ResourceLoader resourceLoader;
 
 	private BeanNameGenerator beanNameGenerator;
@@ -216,15 +222,21 @@ public class SpringApplication {
 	private ConfigurableEnvironment environment;
 
 	private Class<? extends ConfigurableApplicationContext> applicationContextClass;
-
+	/**
+	 * 应用类型
+	 */
 	private WebApplicationType webApplicationType;
 
 	private boolean headless = true;
 
 	private boolean registerShutdownHook = true;
-
+	/**
+	 * 初始化器
+	 */
 	private List<ApplicationContextInitializer<?>> initializers;
-
+	/**
+	 * 监听器
+	 */
 	private List<ApplicationListener<?>> listeners;
 
 	private Map<String, Object> defaultProperties;
@@ -268,19 +280,20 @@ public class SpringApplication {
 		// 设置资源加载器
 		this.resourceLoader = resourceLoader;
 		Assert.notNull(primarySources, "PrimarySources must not be null");
-		// 设置主要来源
+		// 设置主要来源，一般是主启动类的 mainApplicationClass
 		this.primarySources = new LinkedHashSet<>(Arrays.asList(primarySources));
-		// 设置 web 应用类型，有三种类型：REACTIVE、NONE 和 SERVLET。默认是 SERVLET
+		// 从 classpath 推断 web 应用程序类型 设置 web 应用类型，有三种类型：REACTIVE、NONE 和 SERVLET。默认是 SERVLET
 		this.webApplicationType = WebApplicationType.deduceFromClasspath();
 		// 配置上 ApplicationContextInitializer ，通过读取 META-INF/spring.factories 文件里的指定类型的实例名（包名.类名）并实例化。
 		setInitializers((Collection) getSpringFactoriesInstances(
 				ApplicationContextInitializer.class));
 		// 与上面一样配置上应用监听器
 		setListeners((Collection) getSpringFactoriesInstances(ApplicationListener.class));
-		// 配置主应用程序类
+		// 遍历栈帧里的调用方法名，如果方法名是 main 则用反射获取拥有 main 方法名的类
 		this.mainApplicationClass = deduceMainApplicationClass();
 	}
-
+	// 先获取栈帧跟踪信息数组 StackTraceElement[] ，遍历里面的栈帧，如果栈帧里的调用方法名是 main
+	// 则用反射获取这个类
 	private Class<?> deduceMainApplicationClass() {
 		try {
 			StackTraceElement[] stackTrace = new RuntimeException().getStackTrace();
@@ -467,13 +480,13 @@ public class SpringApplication {
 	private <T> Collection<T> getSpringFactoriesInstances(Class<T> type,
 			Class<?>[] parameterTypes, Object... args) {
 		ClassLoader classLoader = getClassLoader();
-		// 读取 META-INF/spring.factories 文件里的指定类型的实例名（包名.类名）
+		// 读取 META-INF/spring.factories 文件里的指定的工厂类型名（包名.类名）
 		Set<String> names = new LinkedHashSet<>(
 				SpringFactoriesLoader.loadFactoryNames(type, classLoader));
 		// 通过反射创建实例
 		List<T> instances = createSpringFactoriesInstances(type, parameterTypes,
 				classLoader, args, names);
-		//给实例排序
+		//给工厂类实例排序
 		AnnotationAwareOrderComparator.sort(instances);
 		return instances;
 	}
@@ -485,10 +498,13 @@ public class SpringApplication {
 		List<T> instances = new ArrayList<>(names.size());
 		for (String name : names) {
 			try {
+				// 反射
 				Class<?> instanceClass = ClassUtils.forName(name, classLoader);
 				Assert.isAssignable(type, instanceClass);
+				// 获取构造器
 				Constructor<?> constructor = instanceClass
 						.getDeclaredConstructor(parameterTypes);
+				// 实例化工厂类放入 instances
 				T instance = (T) BeanUtils.instantiateClass(constructor, args);
 				instances.add(instance);
 			}
@@ -782,12 +798,18 @@ public class SpringApplication {
 	 * Either the ClassLoader that will be used in the ApplicationContext (if
 	 * {@link #setResourceLoader(ResourceLoader) resourceLoader} is set, or the context
 	 * class loader (if not null), or the loader of the Spring {@link ClassUtils} class.
+	 *
+	 * 在应用上下文里将会使用类加载器（如果设置了资源加载器则到资源加载器获取类加载器、
+	 * 或者上下文类加载器（如果不为 null）或者 Spring ClassUtils 的类加载器），返回的类加载器不能为 null。
+	 *
 	 * @return a ClassLoader (never null)
 	 */
 	public ClassLoader getClassLoader() {
+		// 如果有资源加载器则获取资源加载器的类加载器
 		if (this.resourceLoader != null) {
 			return this.resourceLoader.getClassLoader();
 		}
+		// 通过 ClassUtils 获取类加载器
 		return ClassUtils.getDefaultClassLoader();
 	}
 
@@ -1292,6 +1314,9 @@ public class SpringApplication {
 	/**
 	 * Static helper that can be used to run a {@link SpringApplication} from the
 	 * specified source using default settings.
+	 *
+	 * 用来运行使用默认设置的指定源的 Spring 应用程序的静态方法
+	 *
 	 * @param primarySource the primary source to load
 	 * @param args the application arguments (usually passed from a Java main method)
 	 * @return the running {@link ApplicationContext}

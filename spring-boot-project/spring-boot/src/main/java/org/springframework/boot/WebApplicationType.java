@@ -59,18 +59,23 @@ public enum WebApplicationType {
 	private static final String SERVLET_APPLICATION_CONTEXT_CLASS = "org.springframework.web.context.WebApplicationContext";
 
 	private static final String REACTIVE_APPLICATION_CONTEXT_CLASS = "org.springframework.boot.web.reactive.context.ReactiveWebApplicationContext";
-
+	// 如果 classpath 中存在 org.springframework.web.reactive.DispatcherHandler
+	// 但是不存在 org.springframework.web.servlet.DispatcherServlet 和
+	// org.glassfish.jersey.servlet.ServletContainer 时则为 REACTIVE 类型
 	static WebApplicationType deduceFromClasspath() {
 		if (ClassUtils.isPresent(WEBFLUX_INDICATOR_CLASS, null)
 				&& !ClassUtils.isPresent(WEBMVC_INDICATOR_CLASS, null)
 				&& !ClassUtils.isPresent(JERSEY_INDICATOR_CLASS, null)) {
 			return WebApplicationType.REACTIVE;
 		}
+		// 如果 javax.servlet.Servlet 和 org.springframework.web.context.ConfigurableWebApplicationContext 中
+		// 有一个 不在 classpath 中 则推断为不是 web 应用
 		for (String className : SERVLET_INDICATOR_CLASSES) {
 			if (!ClassUtils.isPresent(className, null)) {
 				return WebApplicationType.NONE;
 			}
 		}
+		// 其余情况为 SERVLET 类型
 		return WebApplicationType.SERVLET;
 	}
 
