@@ -25,6 +25,8 @@ import org.springframework.context.ConfigurableApplicationContext;
  * {@link ApplicationContext} is prepared and ApplicationContextInitializers have been
  * called but before any bean definitions are loaded.
  *
+ * 当 Spring 应用启动时并且应用上下文准备好了时发布事件，并且 ApplicationContextInitializers 在加载任何 bean 定义之前被调用。
+ *
  * @author Artsiom Yudovin
  * @since 2.1.0
  */

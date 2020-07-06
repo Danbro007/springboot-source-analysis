@@ -66,19 +66,19 @@ class SpringApplicationRunListeners {
 			listener.contextLoaded(context);
 		}
 	}
-
+	// 发布 Spring 容器已刷新的事件
 	public void started(ConfigurableApplicationContext context) {
 		for (SpringApplicationRunListener listener : this.listeners) {
 			listener.started(context);
 		}
 	}
-
+	// 发布 SpringApplication 已经运行的事件
 	public void running(ConfigurableApplicationContext context) {
 		for (SpringApplicationRunListener listener : this.listeners) {
 			listener.running(context);
 		}
 	}
-
+	// 发布应用失败的事件
 	public void failed(ConfigurableApplicationContext context, Throwable exception) {
 		for (SpringApplicationRunListener listener : this.listeners) {
 			callFailedListener(listener, context, exception);

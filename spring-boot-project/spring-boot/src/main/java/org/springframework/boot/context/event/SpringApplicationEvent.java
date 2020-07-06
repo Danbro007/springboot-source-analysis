@@ -22,6 +22,8 @@ import org.springframework.context.ApplicationEvent;
 /**
  * Base class for {@link ApplicationEvent} related to a {@link SpringApplication}.
  *
+ * 与 Spring 应用相关的 ApplicationEvent 的基本类
+ *
  * @author Phillip Webb
  */
 @SuppressWarnings("serial")

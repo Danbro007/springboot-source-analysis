@@ -26,6 +26,9 @@ import org.springframework.core.env.Environment;
  * {@link ApplicationContext} is fully prepared but not refreshed. The bean definitions
  * will be loaded and the {@link Environment} is ready for use at this stage.
  *
+ * 当 Spring 应用启动并且应用上下文已经完全准备好但是还没有刷新时发布事件。
+ * 这个 bean definition 将会被加载并且在这个阶段 environment 准备好被使用。
+ *
  * @author Dave Syer
  */
 @SuppressWarnings("serial")

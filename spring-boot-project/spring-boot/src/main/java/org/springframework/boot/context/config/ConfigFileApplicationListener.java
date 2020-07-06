@@ -80,17 +80,34 @@ import org.springframework.util.StringUtils;
  * <li>file:./config/:</li>
  * </ul>
  * <p>
+ *
+ *  EnvironmentPostProcessor 通过从已知文件位置(例如：application.properties)加载属性来配置上下文环境。默认情况下，通过读取来自
+ *  application.properties 或者 application.yml 文件在以下位置：
+ *
+ *  classpath:
+ *  file:./
+ *  classpath:config
+ *  file:./config/:
+ *
  * Alternative search locations and names can be specified using
- * {@link #setSearchLocations(String)} and {@link #setSearchNames(String)}.
+ * {@link #application.yml(String)} and {@link #setSearchNames(String)}.
+ *
+ * 可以通过使用 application.yml(String) 和 setSearchNames(String) 来替代指定查找的位置和名字
+ *
  * <p>
  * Additional files will also be loaded based on active profiles. For example if a 'web'
  * profile is active 'application-web.properties' and 'application-web.yml' will be
  * considered.
  * <p>
+ *
+ *  其他文件也将根据活动配置文件加载。例如，将会考虑如果一个 web 配置文件是动态的 application-web.properties 和 application-web.yml。
+ *
  * The 'spring.config.name' property can be used to specify an alternative name to load
  * and the 'spring.config.location' property can be used to specify alternative search
  * locations or specific files.
  * <p>
+ *
+ * spring.config.name 属性能被用来指定要读取文件的名字，并且 spring.config.location 属性能被用来指定查找路径或者指定的文件。
  *
  * @author Dave Syer
  * @author Phillip Webb
@@ -197,6 +214,9 @@ public class ConfigFileApplicationListener
 
 	/**
 	 * Add config file property sources to the specified environment.
+	 *
+	 * 给指定的环境添加配置文件属性源
+	 *
 	 * @param environment the environment to add source to
 	 * @param resourceLoader the resource loader
 	 * @see #addPostProcessors(ConfigurableApplicationContext)

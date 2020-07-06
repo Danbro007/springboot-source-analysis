@@ -40,7 +40,7 @@ import org.springframework.util.ErrorHandler;
  * Uses an internal {@link ApplicationEventMulticaster} for the events that are fired
  * before the context is actually refreshed.
  *
- * 为了在实际刷新上下文之前触发事件可以使用一个内部的 ApplicationEventMulticaster（可以管理多个 ApplicationListener，并且对它们发布时间。 ）
+ * 为了在实际刷新上下文之前触发事件可以使用一个内部的 ApplicationEventMulticaster（可以管理多个 ApplicationListener，并且对它们发布事件。 ）
  *
  * @author Phillip Webb
  * @author Stephane Nicoll
@@ -58,7 +58,9 @@ public class EventPublishingRunListener implements SpringApplicationRunListener,
 	public EventPublishingRunListener(SpringApplication application, String[] args) {
 		this.application = application;
 		this.args = args;
+		// 新建一个新的事件广播器
 		this.initialMulticaster = new SimpleApplicationEventMulticaster();
+		// 把当前应用的所有的监听器放入 initialMulticaster
 		for (ApplicationListener<?> listener : application.getListeners()) {
 			this.initialMulticaster.addApplicationListener(listener);
 		}
@@ -68,25 +70,26 @@ public class EventPublishingRunListener implements SpringApplicationRunListener,
 	public int getOrder() {
 		return 0;
 	}
-
+	// 发布 ApplicationStartingEvent 事件
 	@Override
 	public void starting() {
+		// 用事件广播器来发布 ApplicationStartingEvent 事件
 		this.initialMulticaster.multicastEvent(
 				new ApplicationStartingEvent(this.application, this.args));
 	}
-	// 设置监听的事件
+	// 发布 ApplicationEnvironmentPreparedEvent 事件
 	@Override
 	public void environmentPrepared(ConfigurableEnvironment environment) {
 		this.initialMulticaster.multicastEvent(new ApplicationEnvironmentPreparedEvent(
 				this.application, this.args, environment));
 	}
-
+	// 发布 ApplicationContextInitializedEvent 事件
 	@Override
 	public void contextPrepared(ConfigurableApplicationContext context) {
 		this.initialMulticaster.multicastEvent(new ApplicationContextInitializedEvent(
 				this.application, this.args, context));
 	}
-
+	// 发布 ApplicationPreparedEvent 事件
 	@Override
 	public void contextLoaded(ConfigurableApplicationContext context) {
 		for (ApplicationListener<?> listener : this.application.getListeners()) {
@@ -98,20 +101,20 @@ public class EventPublishingRunListener implements SpringApplicationRunListener,
 		this.initialMulticaster.multicastEvent(
 				new ApplicationPreparedEvent(this.application, this.args, context));
 	}
-
+	// 发布 ApplicationStartedEvent 事件
 	@Override
 	public void started(ConfigurableApplicationContext context) {
 		context.publishEvent(
 				new ApplicationStartedEvent(this.application, this.args, context));
 	}
 
-	// 通知所有的监听器注册这个事件
+	// 通知 ApplicationReadyEvent 这个事件
 	@Override
 	public void running(ConfigurableApplicationContext context) {
 		context.publishEvent(
 				new ApplicationReadyEvent(this.application, this.args, context));
 	}
-
+	// 发布 ApplicationFailedEvent 事件
 	@Override
 	public void failed(ConfigurableApplicationContext context, Throwable exception) {
 		ApplicationFailedEvent event = new ApplicationFailedEvent(this.application,

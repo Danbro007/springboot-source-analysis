@@ -26,6 +26,8 @@ import org.springframework.context.ConfigurableApplicationContext;
  * {@link ApplicationRunner application} and {@link CommandLineRunner command line}
  * runners have been called.
  *
+ * 应用上下文已经被刷新但是在 ApplicationRunner 和 CommandLineRunner 已经被调用前发布一次事件。
+ *
  * @author Andy Wilkinson
  * @since 2.0.0
  */

@@ -332,13 +332,14 @@ public class SpringApplication {
 		// 从 \META-INF\spring.factories 文件获取默认的 SpringApplicationRunListener 实例化并运行
 		// SpringApplicationRunListeners 是来监听 applicationContext 的 run() 方法的。
 		SpringApplicationRunListeners listeners = getRunListeners(args);
-		// 让所有监听器监听 ApplicationStartingEvent 这个事件
+		// 【1】让所有监听器监听 ApplicationStartingEvent 这个事件
 		listeners.starting();
 		try {
 			//提供对用于运行 Spring 应用的参数的访问
 			ApplicationArguments applicationArguments = new DefaultApplicationArguments(
 					args);
-			//创建并配置环境，把环境绑定到 Spring 应用上。
+			// 【2】创建并配置环境，把环境绑定到 Spring 应用上。让监听器监听 ApplicationEnvironmentPreparedEvent 事件
+			// 此时会去加载application.properties等配置文件的环境变量，同时也有标志环境变量已经准备好的意思
 			ConfigurableEnvironment environment = prepareEnvironment(listeners,
 					applicationArguments);
 			//设置要忽略的 bean 信息
@@ -351,11 +352,12 @@ public class SpringApplication {
 			exceptionReporters = getSpringFactoriesInstances(
 					SpringBootExceptionReporter.class,
 					new Class[] { ConfigurableApplicationContext.class }, context);
-			// 把环境、监听器、应用参数和 Banner 注册进 applicationContext
+			// 【3】把环境、监听器、应用参数和 Banner 注册进 applicationContext，并让监听器监听 ApplicationContextInitializedEvent 事件
+			// 表示 Spring 容器已经准备好。
+			// 【4】 监听 ApplicationPreparedEvent 事件
 			prepareContext(context, environment, listeners, applicationArguments,
 					printedBanner);
-			//刷新applicationContext
-			//其实就是 springCore 里的 refresh()的源码
+			//刷新applicationContext，其实就是 springCore 里的 refresh()的源码
 			refreshContext(context);
 			//子类实现刷新 applicationContext 之后的操作，子类可以自己实现。
 			afterRefresh(context, applicationArguments);
@@ -365,18 +367,19 @@ public class SpringApplication {
 				new StartupInfoLogger(this.mainApplicationClass)
 						.logStarted(getApplicationLog(), stopWatch);
 			}
-			//让所有监听器监听 ApplicationStartedEvent 这个事件
+			// 【5】让所有监听器监听 ApplicationStartedEvent 这个事件，标志spring容器已经刷新，此时所有的bean实例都已经加载完毕。
 			listeners.started(context);
 			// 调用所有的 runner
 			callRunners(context, applicationArguments);
 		}
 		catch (Throwable ex) {
+			// 【6】发布 ApplicationFailedEvent 事件
 			handleRunFailure(context, ex, exceptionReporters, listeners);
 			throw new IllegalStateException(ex);
 		}
 
 		try {
-			// 让所有监听器监听 ApplicationStartingEvent 事件
+			// 【7】让所有监听器监听 ApplicationReadyEvent 事件，表示 SpringApplication 已经开始运行。
 			listeners.running(context);
 		}
 		catch (Throwable ex) {
@@ -389,10 +392,10 @@ public class SpringApplication {
 	private ConfigurableEnvironment prepareEnvironment(
 			SpringApplicationRunListeners listeners,
 			ApplicationArguments applicationArguments) {
-		// 创建并配置环境
+		// 获取应用环境
 		ConfigurableEnvironment environment = getOrCreateEnvironment();
 		configureEnvironment(environment, applicationArguments.getSourceArgs());
-		// 让所有监听器注册 ApplicationContextInitializedEvent 事件
+		// 让所有监听器注册 ApplicationEnvironmentPreparedEvent 事件
 		listeners.environmentPrepared(environment);
 		// 给 Spring 应用绑定环境
 		bindToSpringApplication(environment);
@@ -425,6 +428,7 @@ public class SpringApplication {
 		postProcessApplicationContext(context);
 		// 调用所有初始化器对 context 初始化
 		applyInitializers(context);
+		// 对监听器发布 ApplicationContextInitializedEvent 事件
 		listeners.contextPrepared(context);
 		if (this.logStartupInfo) {
 			logStartupInfo(context.getParent() == null);
